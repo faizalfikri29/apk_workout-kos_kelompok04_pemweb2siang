@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
 
             $this->call(JadwalSeeder::class);
 
+            $this->call(TutorialSeeder::class);
 
 
     }

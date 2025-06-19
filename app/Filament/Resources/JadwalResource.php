@@ -22,6 +22,8 @@ class JadwalResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-calendar-days';
     protected static ?string $navigationGroup = 'Workout';
     protected static ?string $modelLabel = 'Jadwal Workout';
+    protected static ?int $navigationSort = 2;
+
 
     public static function form(Form $form): Form
     {
@@ -30,9 +32,19 @@ class JadwalResource extends Resource
                 TextInput::make('nama_workout')->required(),
                 Select::make('kategori')
                     ->options([
-                        'Cardio' => 'Cardio',
-                        'Strength' => 'Strength',
-                        'Stretching' => 'Stretching',
+                        'Bodyweight'   => 'Bodyweight Workout',
+                        'No Equipment' => 'Workout Tanpa Alat',
+                        'HIIT'         => 'High Intensity Interval Training (HIIT)',
+                        'Core'         => 'Latihan Core / Perut',
+                        'Cardio Ringan'=> 'Cardio Ringan di Kamar',
+                        'Stretching'   => 'Stretching & Peregangan',
+                        'Yoga'         => 'Yoga Ringan di Kamar',
+                        'Tabata'       => 'Tabata Workout',
+                        'Full Body'    => 'Full Body Workout',
+                        'Morning Boost'=> 'Workout Pagi Ringan',
+                        'Sleep Prep'   => 'Peregangan Sebelum Tidur',
+                        'Short Break'  => 'Workout Singkat 5-10 Menit',
+                        'Low Impact'   => 'Low Impact (Tidak Lompat)',
                     ])
                     ->required(),
                 TimePicker::make('waktu_mulai')->required(),
