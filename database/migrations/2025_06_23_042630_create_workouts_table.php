@@ -13,11 +13,22 @@ return new class extends Migration
     {
         Schema::create('workouts', function (Blueprint $table) {
             $table->id();
-            $table->string('nama');
+            $table->string('nama_workout');
             $table->text('deskripsi');
             $table->string('video_url')->nullable();
-            $table->foreignId('kategori_workout_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('kategori_workout_id');
+            $table->unsignedBigInteger('jadwal_id')->nullable(); // Relasi ke tabel jadwals
             $table->timestamps();
+
+            $table->foreign('kategori_workout_id')
+                ->references('id')
+                ->on('kategori_workouts')
+                ->onDelete('cascade');
+
+            $table->foreign('jadwal_id')
+                ->references('id')
+                ->on('jadwals')
+                ->onDelete('cascade');
         });
     }
 

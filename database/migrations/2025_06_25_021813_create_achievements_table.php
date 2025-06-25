@@ -11,16 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('jadwal_workouts', function (Blueprint $table) {
+        Schema::create('achievements', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('workout_id'); // relasi ke tabel workouts
-            $table->string('kategori');
-            $table->time('waktu_mulai');
-            $table->time('waktu_selesai');
-            $table->string('hari');
+            $table->string('name');
+            $table->string('description');
+            $table->string('icon'); // Kita akan menggunakan Heroicons (nama ikonnya)
+            $table->string('condition_type'); // Contoh: 'sessions', 'streak'
+            $table->integer('condition_value');
             $table->timestamps();
         });
-        
     }
 
     /**
@@ -28,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('jadwal_workouts');
+        Schema::dropIfExists('achievements');
     }
 };

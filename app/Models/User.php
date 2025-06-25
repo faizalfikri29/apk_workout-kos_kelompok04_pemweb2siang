@@ -45,4 +45,13 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    public function workoutLogs()
+{
+    return $this->hasMany(WorkoutLog::class);
+}
+
+public function achievements()
+{
+    return $this->belongsToMany(Achievement::class)->withTimestamps();
+}
 }
