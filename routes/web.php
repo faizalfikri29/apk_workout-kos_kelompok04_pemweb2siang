@@ -1,132 +1,123 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\User\WorkoutController;
 use App\Models\Tutorial;
 use App\Models\Jadwal;
-use App\Models\WorkoutLog; // Jangan lupa import
-use Illuminate\Support\Facades\Auth; // Jangan lupa import
-use Illuminate\Support\Carbon; // Import
-use App\Models\Achievement; // Import
+use App\Models\WorkoutLog;
+use App\Models\Achievement;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Carbon;
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
 */
 
-// --- Rute ini dimodifikasi untuk peningkatan drastis ---
 Route::get('/', function () {
-    // Mengambil 6 tutorial terbaru untuk galeri
     $tutorials = Tutorial::latest()->take(6)->get();
-    
-    // BARU: Mengambil satu tutorial acak sebagai 'Workout of the Day'
     $workoutOfTheDay = Tutorial::inRandomOrder()->first();
-
-    // Mengambil semua jadwal dan mengelompokkannya berdasarkan hari
     $jadwals = Jadwal::all()->groupBy('hari');
-
-    // Mengirim semua data yang dibutuhkan ke view
     return view('welcome', compact('tutorials', 'jadwals', 'workoutOfTheDay'));
 });
-// --- Akhir Modifikasi ---
-
 
 Route::get('/dashboard', function () {
     $user = Auth::user();
     
-    // --- Data untuk Rekomendasi Latihan ---
-    $latihanHarian = Jadwal::withCount('workouts')->inRandomOrder()->first();
-    $latihanMingguan = Jadwal::withCount('workouts')->where('id', '!=', $latihanHarian->id ?? 0)->inRandomOrder()->first();
+    // 1. REKOMENDASI LATIHAN
+    $namaHariIni = strtolower(Carbon::now()->isoFormat('dddd'));
+    $latihanHarian = Jadwal::withCount('workouts')->where('hari', $namaHariIni)->first();
+    if (!$latihanHarian) {
+        $latihanHarian = Jadwal::withCount('workouts')->where('hari', '!=', 'mingguan')->inRandomOrder()->first();
+    }
+    $latihanMingguan = Jadwal::withCount('workouts')->where('hari', 'mingguan')->inRandomOrder()->first();
 
-    // --- Kalkulasi Statistik ---
+    // 2. KALKULASI STATISTIK
     $logs = $user->workoutLogs()->orderBy('created_at', 'desc')->get();
-    $totalSesi = $logs->count();
+    $totalSesi = $logs->map(fn($log) => $log->created_at->startOfDay())->unique()->count();
     $totalMenit = round($logs->sum('duration_seconds') / 60);
-
-    // --- Logika Streak yang Lebih Akurat ---
+    
+    // Logika Streak
     $streak = 0;
     if ($totalSesi > 0) {
         $logDates = $logs->map(fn($log) => $log->created_at->startOfDay())->unique();
-        $streak = 1;
-        $currentDate = $logDates->first();
-        if ($currentDate->isToday() || $currentDate->isYesterday()) {
+        $currentStreakDate = Carbon::today();
+        if ($logDates->contains($currentStreakDate) || $logDates->contains(Carbon::yesterday())) {
+            $streak = 1;
+            $lastDate = $logDates->first();
             foreach ($logDates->slice(1) as $date) {
-                if ($currentDate->diffInDays($date) == 1) {
+                if ($lastDate->diffInDays($date) == 1) {
                     $streak++;
-                    $currentDate = $date;
+                    $lastDate = $date;
                 } else {
                     break;
                 }
             }
-        } else { $streak = 0; }
+        }
     }
     
     $stats = ['totalSesi' => $totalSesi, 'totalMenit' => $totalMenit, 'streak' => $streak];
     
-    // --- Logika Pengecekan & Pemberian Achievement ---
+    // 3. DATA UNTUK GRAFIK
+    $weekDates = collect(range(0, 6))->map(fn ($i) => Carbon::today()->subDays($i));
+    $workoutMinutesPerDay = WorkoutLog::where('user_id', $user->id)
+        ->where('created_at', '>=', $weekDates->last()->startOfDay())
+        ->selectRaw('DATE(created_at) as date, SUM(duration_seconds) as total_duration')
+        ->groupBy('date')
+        ->get()->keyBy(fn ($log) => Carbon::parse($log->date)->toDateString());
+
+    $stats['weekly_progress_labels'] = $weekDates->map(fn ($date) => $date->isoFormat('ddd'))->reverse()->toArray();
+    $stats['weekly_progress_data'] = $weekDates->map(fn ($date) => 
+        isset($workoutMinutesPerDay[$date->toDateString()]) ? 
+        round($workoutMinutesPerDay[$date->toDateString()]->total_duration / 60) : 0
+    )->reverse()->toArray();
+    
+    // 4. LOGIKA ACHIEVEMENT
+    // FIX: Mengambil semua achievement dan ID yang sudah dimiliki user
     $allAchievements = Achievement::all();
-    $currentUserAchievements = $user->achievements()->pluck('achievement_id')->toArray();
-    $unlockedAchievements = [];
+    $userAchievementIds = $user->achievements()->pluck('id')->toArray();
 
     foreach ($allAchievements as $achievement) {
-        if (!in_array($achievement->id, $currentUserAchievements)) {
+        if (!in_array($achievement->id, $userAchievementIds)) {
             $unlocked = false;
             if ($achievement->condition_type == 'sessions' && $totalSesi >= $achievement->condition_value) {
                 $unlocked = true;
-            } elseif ($achievement->condition_type == 'streak' && $streak >= $achievement->condition_value) {
+            } elseif ($achievement->condition_type == 'streak' && $stats['streak'] >= $achievement->condition_value) {
                 $unlocked = true;
             }
-
             if ($unlocked) {
                 $user->achievements()->attach($achievement->id);
+                // Set session flash untuk notifikasi modal
+                session()->flash('newAchievement', $achievement);
+                // Tambahkan ID yang baru dibuka ke array agar tidak dicek ulang
+                $userAchievementIds[] = $achievement->id;
             }
         }
     }
 
-    // --- Data untuk Frontend ---
+    // 5. DATA UNTUK FRONTEND
     $workoutDates = $logs->map(fn($log) => $log->created_at->toDateString())->unique()->values()->toArray();
-    $userAchievements = $user->achievements()->get();
 
     return view('dashboard', [
         'latihanHarian' => $latihanHarian,
         'latihanMingguan' => $latihanMingguan,
         'stats' => $stats,
         'workoutDates' => $workoutDates,
-        'userAchievements' => $userAchievements,
+        'allAchievements' => $allAchievements,      // <- Variabel yang dibutuhkan dikirim di sini
+        'userAchievementIds' => $userAchievementIds,  // <- Variabel yang dibutuhkan dikirim di sini
     ]);
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-
-// 2. Tambahkan Route BARU untuk memulai sesi workout
-Route::get('/workout/session/{jadwal}', [WorkoutController::class, 'startSession'])
-    ->middleware(['auth'])
-    ->name('workout.session.start');
-
-
+// Middleware Group untuk semua rute yang butuh login
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('/workout/session/{jadwal}', [WorkoutController::class, 'startSession'])->name('workout.session.start');
+    Route::post('/workout/log', [WorkoutController::class, 'storeLog'])->name('workout.log.store'); 
 });
-
-Route::get('/workout/session/{jadwal}', [WorkoutController::class, 'startSession'])
-    ->middleware(['auth'])
-    ->name('workout.session.start');
-
-// TAMBAHKAN ROUTE BARU DI BAWAH INI
-Route::post('/workout/log', [WorkoutController::class, 'logSession'])
-    ->middleware(['auth'])
-    ->name('workout.session.log');
-
-Route::middleware('auth')->group(function () {
-        Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-        Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-        Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    });
 
 require __DIR__.'/auth.php';

@@ -1,58 +1,149 @@
 <x-app-layout>
+    {{-- Slot Header dengan Sapaan Dinamis & Kutipan Motivasi --}}
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            Hi, {{ Auth::user()->name }}. Siap untuk berkeringat?
-        </h2>
+        <div>
+            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                {{ $greeting ?? 'Halo' }}, {{ Auth::user()->name }}!
+            </h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 italic">
+                @php
+                    $quotes = [
+                        "Satu-satunya latihan yang buruk adalah yang tidak dilakukan.",
+                        "Keringat hari ini adalah kekuatan hari esok.",
+                        "Rasa sakit yang kamu rasakan hari ini adalah kekuatan yang kamu rasakan besok.",
+                        "Proses tidak akan mengkhianati hasil.",
+                    ];
+                @endphp
+                "{{ $quotes[array_rand($quotes)] }}"
+            </p>
+        </div>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-12" x-data="{ newAchievement: {{ session()->has('newAchievement') ? 'true' : 'false' }} }">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            
+            {{-- Statistik Utama dengan Animasi Angka dan On-Load --}}
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8" x-data x-init="
+                $el.childNodes.forEach((node, i) => {
+                    if (node.nodeType === 1) { // Memastikan ini adalah elemen HTML
+                        setTimeout(() => { node.classList.remove('opacity-0', 'translate-y-4') }, (i * 100));
+                    }
+                })
+            ">
+                {{-- Kartu Total Sesi --}}
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg flex items-center space-x-4 transition-all duration-500 opacity-0 translate-y-4 hover:shadow-xl hover:-translate-y-1">
+                    <div class="bg-blue-100 dark:bg-blue-900 p-3 rounded-xl">@svg('heroicon-o-play-circle', 'h-8 w-8 text-blue-500')</div>
+                    <div>
+                        <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">Total Sesi</p>
+                        <p class="text-3xl font-bold text-gray-800 dark:text-gray-100" x-data="counter({{ $stats['totalSesi'] ?? 0 }})" x-text="Math.round(current)"></p>
+                    </div>
+                </div>
+                {{-- Kartu Total Menit --}}
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg flex items-center space-x-4 transition-all duration-500 opacity-0 translate-y-4 hover:shadow-xl hover:-translate-y-1">
+                    <div class="bg-green-100 dark:bg-green-900 p-3 rounded-xl">@svg('heroicon-o-clock', 'h-8 w-8 text-green-500')</div>
+                    <div>
+                        <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">Total Menit</p>
+                        <p class="text-3xl font-bold text-gray-800 dark:text-gray-100" x-data="counter({{ $stats['totalMenit'] ?? 0 }})" x-text="Math.round(current)"></p>
+                    </div>
+                </div>
+                {{-- Kartu Workout Streak --}}
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg flex items-center space-x-4 transition-all duration-500 opacity-0 translate-y-4 hover:shadow-xl hover:-translate-y-1">
+                    <div class="bg-orange-100 dark:bg-orange-900 p-3 rounded-xl">@svg('heroicon-o-fire', 'h-8 w-8 text-orange-500')</div>
+                    <div>
+                        <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">Workout Streak</p>
+                        <p class="text-3xl font-bold text-gray-800 dark:text-gray-100">
+                           <span x-data="counter({{ $stats['streak'] ?? 0 }})" x-text="Math.round(current)"></span> <span class="text-base font-medium">Hari</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 
-                <div class="lg:col-span-2 space-y-8">
-                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                        <div class="p-6 text-gray-900 dark:text-gray-100">
-                            <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-200">Latihan Hari Ini</h3>
-                            @if($latihanHarian)
-                                <div class="mt-4 p-4 border dark:border-gray-700 rounded-lg">
+                {{-- Kolom Kiri --}}
+                <div class="lg:col-span-2 space-y-8" x-data x-init="
+                    $el.childNodes.forEach((node, i) => {
+                        if (node.nodeType === 1) {
+                            setTimeout(() => { node.classList.remove('opacity-0', 'translate-y-4') }, 200 + (i * 100));
+                        }
+                    })
+                ">
+                    {{-- Latihan Hari Ini --}}
+                    @if($latihanHarian)
+                        <div class="relative bg-gradient-to-br from-indigo-700 to-purple-800 overflow-hidden shadow-2xl rounded-2xl text-white transition-all duration-500 opacity-0 translate-y-4">
+                            <div class="p-8">
+                                <h3 class="text-2xl font-bold">Latihan Hari Ini</h3>
+                                <div class="mt-4 p-5 border-2 border-dashed border-white/50 rounded-lg bg-white/10">
                                     <h4 class="text-xl font-semibold">{{ $latihanHarian->nama_jadwal }}</h4>
-                                    <p class="mt-1 text-sm dark:text-gray-300">{{ $latihanHarian->deskripsi }}</p>
+                                    <p class="mt-1 text-sm text-indigo-200">{{ $latihanHarian->deskripsi }}</p>
                                     <div class="mt-4">
-                                        <span class="text-sm bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 px-2 py-1 rounded-full">{{ $latihanHarian->workouts_count }} jenis latihan</span>
-                                        <span class="text-sm bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 px-2 py-1 rounded-full ml-2">Estimasi: {{ $latihanHarian->workouts_count * 3 }} menit</span>
+                                        <span class="text-xs font-semibold bg-white/20 text-white px-2 py-1 rounded-full">{{ $latihanHarian->workouts_count }} jenis latihan</span>
+                                        <span class="text-xs font-semibold bg-white/20 text-white px-2 py-1 rounded-full ml-2">Estimasi: {{ $latihanHarian->workouts_count * 3 }} menit</span>
                                     </div>
                                 </div>
-                                <a href="{{ route('workout.session.start', $latihanHarian->id) }}" class="mt-6 inline-block w-full text-center px-6 py-3 bg-indigo-600 border border-transparent rounded-md font-semibold text-white uppercase tracking-widest hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:ring focus:ring-indigo-200 active:bg-indigo-600 transition text-lg">
+                                <a href="{{ route('workout.session.start', $latihanHarian->id) }}" class="mt-6 inline-flex items-center justify-center w-full px-6 py-4 bg-white border border-transparent rounded-xl font-bold text-indigo-700 uppercase tracking-widest hover:bg-indigo-100 transition text-lg shadow-lg animate-pulse hover:animate-none">
                                     Mulai Latihan Sekarang!
+                                    @svg('heroicon-o-arrow-right', 'w-6 h-6 ml-3')
                                 </a>
-                            @else
-                                <p class="mt-4 text-gray-500">Tidak ada rekomendasi latihan hari ini. Coba cek lagi besok!</p>
-                            @endif
+                            </div>
+                        </div>
+                    @else
+                        {{-- Kartu Hari Istirahat --}}
+                        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-2xl flex items-center p-8 transition-all duration-500 opacity-0 translate-y-4">
+                            <div>
+                                <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-200">Hari Istirahat!</h3>
+                                <p class="mt-2 text-gray-600 dark:text-gray-300">Tubuhmu butuh waktu untuk pulih. Manfaatkan hari ini untuk istirahat.</p>
+                                <a href="#" class="mt-4 inline-flex items-center text-indigo-600 dark:text-indigo-400 font-semibold">
+                                    Lihat Semua Jadwal Latihan @svg('heroicon-o-arrow-right', 'w-4 h-4 ml-1')
+                                </a>
+                            </div>
+                            @svg('heroicon-o-sparkles', 'h-24 w-24 text-yellow-400 ml-8 opacity-50 hidden sm:block')
+                        </div>
+                    @endif
+                    
+                    {{-- Grafik Progress & Distribusi Latihan dalam Tabs --}}
+                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-2xl transition-all duration-500 opacity-0 translate-y-4" x-data="{ tab: 'weekly' }">
+                        <div class="p-6">
+                            <div class="border-b border-gray-200 dark:border-gray-700">
+                                <nav class="-mb-px flex space-x-6">
+                                    <button @click="tab = 'weekly'" :class="{ 'border-indigo-500 text-indigo-600': tab === 'weekly', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': tab !== 'weekly' }" class="whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm">Progress Mingguan</button>
+                                    <button @click="tab = 'distribution'" :class="{ 'border-indigo-500 text-indigo-600': tab === 'distribution', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': tab !== 'distribution' }" class="whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm">Tipe Latihan</button>
+                                </nav>
+                            </div>
+                            <div class="mt-6">
+                                <div x-show="tab === 'weekly'" x-cloak class="h-64"><canvas id="weeklyProgressChart"></canvas></div>
+                                <div x-show="tab === 'distribution'" x-cloak class="h-64 flex justify-center items-center"><canvas id="workoutTypeChart"></canvas></div>
+                            </div>
                         </div>
                     </div>
-                    
-                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg" 
-                         x-data="workoutCalendar({ workoutDates: {{ json_encode($workoutDates) }} })">
+                </div>
+
+                {{-- Kolom Kanan --}}
+                <div class="lg:col-span-1 space-y-8" x-data x-init="
+                     $el.childNodes.forEach((node, i) => {
+                        if (node.nodeType === 1) {
+                            setTimeout(() => { node.classList.remove('opacity-0', 'translate-y-4') }, 400 + (i * 100));
+                        }
+                    })
+                ">
+                    {{-- Kalender --}}
+                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-2xl transition-all duration-500 opacity-0 translate-y-4" x-data="workoutCalendar({ workoutDates: {{ json_encode($workoutDates ?? []) }} })" x-cloak>
                         <div class="p-6 text-gray-900 dark:text-gray-100">
-                            <div class="flex justify-between items-center">
+                             <div class="flex justify-between items-center">
                                 <h3 class="text-lg font-semibold" x-text="`${monthNames[month]} ${year}`"></h3>
                                 <div>
-                                    <button @click="prevMonth()" class="px-2 py-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700">&lt;</button>
-                                    <button @click="nextMonth()" class="px-2 py-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700">&gt;</button>
+                                    <button @click="prevMonth()" class="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">&lt;</button>
+                                    <button @click="nextMonth()" class="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">&gt;</button>
                                 </div>
                             </div>
-                            <div class="mt-4 grid grid-cols-7 gap-1 text-center text-xs">
-                                <template x-for="day in days" :key="day">
-                                    <div class="text-gray-500" x-text="day"></div>
-                                </template>
-                                <template x-for="blankday in blankdays">
-                                    <div></div>
-                                </template>
+                            <div class="mt-4 grid grid-cols-7 gap-2 text-center text-xs">
+                                <template x-for="day in days" :key="day"><div class="text-gray-500 font-medium" x-text="day"></div></template>
+                                <template x-for="blankday in blankdays"><div></div></template>
                                 <template x-for="date in no_of_days" :key="date">
-                                    <div class="w-full h-10 flex items-center justify-center rounded" 
+                                    <div class="w-full h-8 flex items-center justify-center rounded-full"
                                          :class="{
-                                            'bg-green-500 text-white': isWorkoutDay(date),
-                                            'bg-indigo-500 text-white': isToday(date) && isWorkoutDay(date),
+                                            'bg-green-500 text-white font-bold': isWorkoutDay(date),
+                                            'bg-indigo-600 text-white': isToday(date) && isWorkoutDay(date),
                                             'ring-2 ring-indigo-500': isToday(date) && !isWorkoutDay(date)
                                          }"
                                          x-text="date">
@@ -61,121 +152,166 @@
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="lg:col-span-1 space-y-8">
-                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg text-center">
-                        <div class="p-6 text-gray-900 dark:text-gray-100">
-                           <h4 class="text-lg font-semibold">Progress Saya</h4>
-                           <div class="mt-4 flex justify-around">
-                               <div>
-                                   <p class="text-3xl font-bold">{{ $stats['totalSesi'] }}</p>
-                                   <p class="text-xs text-gray-500">Sesi</p>
-                               </div>
-                               <div>
-                                   <p class="text-3xl font-bold">{{ $stats['totalMenit'] }}</p>
-                                   <p class="text-xs text-gray-500">Menit</p>
-                               </div>
-                               <div>
-                                   <p class="text-3xl font-bold text-orange-400">{{ $stats['streak'] }}</p>
-                                   <p class="text-xs text-gray-500">Streak</p>
-                               </div>
-                           </div>
+                    {{-- Menuju Lencana Berikutnya --}}
+                    @if(isset($nextAchievement))
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg transition-all duration-500 opacity-0 translate-y-4">
+                        <h4 class="text-lg font-semibold mb-3 text-gray-900 dark:text-gray-100">Menuju Lencana Berikutnya</h4>
+                        <div class="flex items-center space-x-4">
+                            <div class="flex-shrink-0">@svg($nextAchievement->icon, 'h-12 w-12 text-gray-400 dark:text-gray-500')</div>
+                            <div class="w-full">
+                                <p class="font-semibold text-gray-800 dark:text-gray-200">{{ $nextAchievement->name }}</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ $nextAchievement->description }}</p>
+                                <div class="mt-2">
+                                    <div class="bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                                        <div class="bg-gradient-to-r from-green-400 to-blue-500 h-2.5 rounded-full" style="width: {{ $nextAchievementProgress ?? 0 }}%"></div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    
-                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                    @endif
+
+                    {{-- Lencana Penghargaan --}}
+                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-2xl transition-all duration-500 opacity-0 translate-y-4">
                         <div class="p-6 text-gray-900 dark:text-gray-100">
-                           <h4 class="text-lg font-semibold mb-4">Lencana Penghargaan</h4>
-                           @if($userAchievements->isNotEmpty())
+                            <h4 class="text-lg font-semibold mb-4">Lencana Penghargaan</h4>
+                            @if(isset($allAchievements) && $allAchievements->isNotEmpty())
                                 <div class="grid grid-cols-4 gap-4">
-                                    @foreach($userAchievements as $achievement)
-                                        <div class="text-center" x-data="{ tooltip: false }">
-                                            @svg($achievement->icon, 'h-10 w-10 mx-auto text-yellow-400')
-                                            <p class="text-xs mt-1 truncate">{{ $achievement->name }}</p>
+                                    @foreach($allAchievements as $achievement)
+                                        @php $unlocked = isset($userAchievementIds) && in_array($achievement->id, $userAchievementIds); @endphp
+                                        <div class="text-center" title="{{ $achievement->description }}">
+                                            <div class="relative">
+                                                @svg($achievement->icon, 'h-12 w-12 mx-auto transition-all ' . ($unlocked ? 'text-yellow-400 hover:scale-110' : 'text-gray-300 dark:text-gray-600 opacity-60'))
+                                                @if(!$unlocked)
+                                                    @svg('heroicon-s-lock-closed', 'h-5 w-5 absolute bottom-0 right-2 text-gray-400 dark:text-gray-500')
+                                                @endif
+                                            </div>
+                                            <p class="text-xs mt-2 truncate font-semibold {{ $unlocked ? '' : 'text-gray-400 dark:text-gray-500' }}">{{ $achievement->name }}</p>
                                         </div>
                                     @endforeach
                                 </div>
-                           @else
-                                <p class="text-sm text-gray-500">Teruslah berlatih untuk mendapatkan lencana pertamamu!</p>
-                           @endif
+                            @else
+                                <p class="text-sm text-gray-500">Lencana akan muncul di sini. Teruslah berlatih!</p>
+                            @endif
                         </div>
                     </div>
-
-                    @if($latihanMingguan)
-                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                        <div class="p-6 text-gray-900 dark:text-gray-100">
-                            <h4 class="text-lg font-semibold">Tantangan Lain</h4>
-                            <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">{{ $latihanMingguan->nama_jadwal }}</p>
-                            <a href="{{ route('workout.session.start', $latihanMingguan->id) }}" class="mt-4 inline-block w-full text-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-500 transition">
-                                Coba Latihan
-                            </a>
-                        </div>
-                    </div>
-                     @endif
                 </div>
             </div>
         </div>
+
+        {{-- Modal Notifikasi Lencana Baru --}}
+        @if(session()->has('newAchievement'))
+        <div x-show="newAchievement" x-transition @click.away="newAchievement = false" class="fixed inset-0 bg-black/75 flex items-center justify-center p-4 z-50" x-cloak>
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl text-center p-8 max-w-sm mx-auto" @click.stop>
+                <h3 class="text-sm font-semibold uppercase text-yellow-500 tracking-wider">Lencana Baru Terbuka!</h3>
+                <div class="my-4">@svg(session('newAchievement')->icon, 'h-24 w-24 mx-auto text-yellow-400 animate-pulse')</div>
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200">{{ session('newAchievement')->name }}</h2>
+                <p class="text-gray-600 dark:text-gray-300 mt-2">{{ session('newAchievement')->description }}</p>
+                <button @click="newAchievement = false" class="mt-6 w-full px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-500 transition">Luar Biasa!</button>
+            </div>
+        </div>
+        @endif
     </div>
-    
-    <script>
-    function workoutCalendar(options) {
-        return {
-            month: '',
-            year: '',
-            no_of_days: [],
-            blankdays: [],
-            days: ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'],
-            monthNames: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'],
-            workoutDates: options.workoutDates || [],
-            
-            init() {
-                const today = new Date();
-                this.month = today.getMonth();
-                this.year = today.getFullYear();
-                this.getNoOfDays();
-            },
-            
-            isToday(date) {
-                const today = new Date();
-                const d = new Date(this.year, this.month, date);
-                return today.toDateString() === d.toDateString();
-            },
-
-            isWorkoutDay(date) {
-                const d = new Date(this.year, this.month, date);
-                const formattedDate = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-                return this.workoutDates.includes(formattedDate);
-            },
-
-            getNoOfDays() {
-                let daysInMonth = new Date(this.year, this.month + 1, 0).getDate();
-                let dayOfWeek = new Date(this.year, this.month).getDay();
-                
-                this.blankdays = Array.from({ length: dayOfWeek }, (_, i) => i + 1);
-                this.no_of_days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
-            },
-
-            prevMonth() {
-                if (this.month == 0) {
-                    this.year--;
-                    this.month = 11;
-                } else {
-                    this.month--;
-                }
-                this.getNoOfDays();
-            },
-
-            nextMonth() {
-                if (this.month == 11) {
-                    this.month = 0;
-                    this.year++;
-                } else {
-                    this.month++;
-                }
-                this.getNoOfDays();
-            },
-        }
-    }
-    </script>
 </x-app-layout>
+
+{{-- Pastikan Chart.js diimpor di layout utama Anda --}}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+document.addEventListener('alpine:init', () => {
+    // Komponen untuk animasi counter angka
+    Alpine.data('counter', (target) => ({
+        current: 0,
+        target: parseFloat(target) || 0,
+        init() {
+            let frame = () => {
+                const increment = this.target / 100;
+                if (this.current < this.target) {
+                    this.current += increment;
+                    requestAnimationFrame(frame);
+                } else {
+                    this.current = this.target;
+                }
+            };
+            setTimeout(() => requestAnimationFrame(frame), 250);
+        }
+    }));
+
+    // Komponen untuk kalender (INI YANG SEBELUMNYA HILANG)
+    Alpine.data('workoutCalendar', (options) => ({
+        month: '', year: '', no_of_days: [], blankdays: [],
+        days: ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'],
+        monthNames: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'],
+        workoutDates: options.workoutDates || [],
+        init() {
+            const today = new Date();
+            this.month = today.getMonth();
+            this.year = today.getFullYear();
+            this.getNoOfDays();
+        },
+        isToday(date) {
+            const today = new Date();
+            const d = new Date(this.year, this.month, date);
+            return today.toDateString() === d.toDateString();
+        },
+        isWorkoutDay(date) {
+            const d = new Date(this.year, this.month, date);
+            const formattedDate = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+            return this.workoutDates.includes(formattedDate);
+        },
+        getNoOfDays() {
+            let daysInMonth = new Date(this.year, this.month + 1, 0).getDate();
+            let dayOfWeek = new Date(this.year, this.month).getDay();
+            this.blankdays = Array.from({ length: dayOfWeek });
+            this.no_of_days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+        },
+        prevMonth() {
+            if (this.month == 0) { this.year--; this.month = 11; } else { this.month--; }
+            this.getNoOfDays();
+        },
+        nextMonth() {
+            if (this.month == 11) { this.month = 0; this.year++; } else { this.month++; }
+            this.getNoOfDays();
+        },
+    }));
+});
+
+// Inisialisasi semua grafik setelah DOM siap
+document.addEventListener('DOMContentLoaded', () => {
+    // Grafik Progress Mingguan
+    const weeklyChartEl = document.getElementById('weeklyProgressChart');
+    if (weeklyChartEl) {
+        new Chart(weeklyChartEl, {
+            type: 'line',
+            data: {
+                labels: {!! json_encode(isset($stats['weekly_progress_labels']) ? $stats['weekly_progress_labels'] : []) !!},
+                datasets: [{
+                    label: 'Menit Latihan',
+                    data: {!! json_encode(isset($stats['weekly_progress_data']) ? $stats['weekly_progress_data'] : []) !!},
+                    backgroundColor: 'rgba(79, 70, 229, 0.2)', borderColor: 'rgba(79, 70, 229, 1)',
+                    borderWidth: 2, tension: 0.4, fill: true, pointBackgroundColor: 'rgba(79, 70, 229, 1)', pointBorderColor: '#fff',
+                }]
+            },
+            options: { scales: { y: { beginAtZero: true } }, responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        });
+    }
+
+    // Grafik Distribusi Tipe Latihan
+    const workoutTypeChartEl = document.getElementById('workoutTypeChart');
+    if (workoutTypeChartEl) {
+        new Chart(workoutTypeChartEl, {
+            type: 'doughnut',
+            data: {
+                labels: {!! json_encode(isset($stats['workout_type_distribution']['labels']) ? $stats['workout_type_distribution']['labels'] : []) !!},
+                datasets: [{
+                    data: {!! json_encode(isset($stats['workout_type_distribution']['data']) ? $stats['workout_type_distribution']['data'] : []) !!},
+                    backgroundColor: ['rgba(59, 130, 246, 0.8)', 'rgba(239, 68, 68, 0.8)', 'rgba(16, 185, 129, 0.8)', 'rgba(251, 191, 36, 0.8)'],
+                    borderColor: '#fff', borderWidth: 2,
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { padding: 20 } } } }
+        });
+    }
+});
+</script>

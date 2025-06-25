@@ -27,6 +27,8 @@ return [
     */
 
     'env' => env('APP_ENV', 'production'),
+// config/app.php (tidak selalu diperlukan di Laravel 8+)
+BladeUI\Heroicons\BladeHeroiconsServiceProvider::class,
 
     /*
     |--------------------------------------------------------------------------
@@ -124,3 +126,4 @@ return [
     ],
 
 ];
+
