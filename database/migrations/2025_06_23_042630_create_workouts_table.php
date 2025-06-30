@@ -12,12 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('workouts', function (Blueprint $table) {
-            $table->id();
-            $table->string('nama');
-            $table->text('deskripsi');
-            $table->string('video_url')->nullable();
-            $table->foreignId('kategori_workout_id')->constrained()->onDelete('cascade');
-            $table->timestamps();
+            $table->id(); // Kolom ID unik untuk setiap latihan
+            $table->string('name'); // Nama latihan, misal: "Push-Up"
+            $table->string('image_path')->nullable(); // Path ke file gambar ilustrasi
+            $table->string('category'); // Kategori, misal: "Kekuatan", "Kardio"
+            $table->text('description')->nullable(); // Deskripsi cara melakukan
+            $table->string('difficulty')->default('pemula'); // pemula, menengah, mahir
+            $table->integer('duration')->nullable(); // Durasi rekomendasi dalam detik
+            $table->integer('calories')->nullable(); // Estimasi kalori terbakar
+            $table->string('video_url')->nullable(); // Link ke video tutorial
+            $table->timestamps(); // Kolom created_at dan updated_at
         });
     }
 

@@ -35,7 +35,7 @@ class TutorialResource extends Resource
                 Grid::make(2)->schema([
                     TextInput::make('judul')
                         ->label('Judul Workout')
-                        ->placeholder('Contoh: Cardio Ringan Pagi')
+                        ->placeholder('Contoh: Cardio Ringan')
                         ->required(),
 
                     FileUpload::make('gambar_url')

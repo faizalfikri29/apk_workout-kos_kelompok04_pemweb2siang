@@ -10,18 +10,19 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    {
-        Schema::create('kategoriworkouts', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
-    }
+{
+    Schema::table('users', function (Blueprint $table) {
+        $table->time('reminder_time')->nullable()->after('fitness_level'); // Menyimpan waktu, misal: '17:30:00'
+    });
+}
 
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('kategoriworkouts');
+        Schema::table('users', function (Blueprint $table) {
+            //
+        });
     }
 };

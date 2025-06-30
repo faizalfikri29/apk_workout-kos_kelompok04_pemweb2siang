@@ -2,19 +2,24 @@
 
 namespace App\Providers\Filament;
 
+// Impor kelas-kelas widget kustom Anda
+use App\Filament\Widgets\StatsOverview;
+use App\Filament\Widgets\UserGrowthChart;
+use App\Filament\Widgets\LatestUsers;
+
 use Filament\Http\Middleware\Authenticate;
-use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\Widgets;
+// Anda tidak perlu 'use Filament\Widgets' jika memanggil kelasnya secara langsung
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
@@ -36,9 +41,11 @@ class AdminPanelProvider extends PanelProvider
                 Pages\Dashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
+            // Ganti isi array ini dengan widget kustom Anda
             ->widgets([
-                Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+                StatsOverview::class,
+                // UserGrowthChart::class,
+                LatestUsers::class,
             ])
             ->middleware([
                 EncryptCookies::class,

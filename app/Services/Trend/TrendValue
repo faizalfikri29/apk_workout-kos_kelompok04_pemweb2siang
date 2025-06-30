@@ -1,0 +1,12 @@
+<?php
+
+// namespace App\Services\Trend;
+
+// class TrendValue
+// {
+//     public function __construct(
+//         public readonly string $date,
+//         public readonly mixed $aggregate,
+//     ) {
+//     }
+// }
