@@ -1,7 +1,8 @@
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
-    <meta charset="utf-g">
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
@@ -17,17 +18,22 @@
     </style>
 </head>
 <body class="font-sans antialiased bg-gray-900 text-gray-200">
+
+    {{-- PERBAIKAN 1: Memeriksa apakah jadwal latihan memiliki gerakan/isi --}}
+    @if($jadwal->workouts->isNotEmpty())
+
     <div 
-    class="container mx-auto p-4 md:p-8"
-    x-data="workoutSession({
-        jadwalId: {{ $jadwal->id }},
-        exercises: {{ $jadwal->workouts->map(function($w) { return ['name' => $w->nama_workout, 'duration' => $w->durasi_menit * 60, 'tutorial' => $w->tutorial->gambar_url ?? '']; })->toJson() }},
-        restDuration: 30
-    })"
-    x-cloak
->
+        class="container mx-auto p-4 md:p-8"
+        x-data="workoutSession({
+            {{-- PERBAIKAN 2: Mengirim ID Jadwal ke JavaScript --}}
+            jadwalId: {{ $jadwal->id }},
+            exercises: {{ $jadwal->workouts->map(function($w) { return ['name' => $w->nama_workout, 'duration' => $w->durasi_menit * 60, 'tutorial' => $w->tutorial->gambar_url ?? '']; })->toJson() }},
+            restDuration: 30
+        })"
+        x-cloak
+    >
         <div class="text-center mb-8">
-            <h1 class="text-3xl md:text-4xl font-bold">{{ $jadwal->nama_jadwal }}</h1>
+            <h1 class="text-3xl md:text-4xl font-bold">{{ $jadwal->nama_workout }}</h1>
             <p class="text-lg text-gray-400" x-text="statusText"></p>
         </div>
 
@@ -63,18 +69,33 @@
                 </div>
             </div>
         </template>
-
     </div>
+
+    @else 
+    {{-- Blok ini ditampilkan jika jadwal latihan tidak punya isi --}}
+    <div class="container mx-auto p-4 md:p-8 text-center">
+        <div class="bg-gray-800 shadow-xl rounded-lg p-10 max-w-2xl mx-auto">
+            <h1 class="text-3xl font-bold text-yellow-400 mb-4">Latihan Tidak Ditemukan</h1>
+            <p class="text-lg text-gray-300">
+                Jadwal latihan <strong>"{{ $jadwal->nama_jadwal }}"</strong> tidak memiliki daftar gerakan. Silakan periksa kembali konfigurasi jadwal Anda.
+            </p>
+            <a href="{{ route('dashboard') }}" class="mt-8 inline-block px-6 py-3 bg-indigo-600 text-white rounded-lg font-bold">
+                Kembali ke Dashboard
+            </a>
+        </div>
+    </div>
+    @endif
 
     <script>
         function workoutSession(options) {
             return {
-                jadwalId: options.jadwalId, // Tambahkan ini
+                jadwalId: options.jadwalId,
                 exercises: options.exercises || [],
                 restDuration: options.restDuration || 30,
-                totalTimeSpent: 0, // Tambahkan ini untuk melacak waktu
+                totalTimeSpent: 0,
                 
                 currentIndex: 0,
+                // PERBAIKAN 3: Mengubah nilai awal timer menjadi 0
                 timer: 0,
                 isResting: false,
                 isPaused: true,
@@ -84,18 +105,6 @@
                 init() {
                     this.setStep();
                 },
-
-                startTimer() {
-                if(this.timer <= 0) return;
-                this.isPaused = false;
-                this.interval = setInterval(() => {
-                    this.timer--;
-                    this.totalTimeSpent++; // Tambahkan ini
-                    if (this.timer <= 0) {
-                        this.nextStep();
-                    }
-                }, 1000);
-            },
 
                 get currentExercise() {
                     return this.exercises[this.currentIndex];
@@ -111,7 +120,10 @@
                 },
                 get progressPercentage() {
                     if(this.exercises.length === 0) return 0;
-                    return ((this.currentIndex + (this.isResting ? 1 : 0)) / (this.exercises.length * 2 -1)) * 100;
+                    // Formula progress yang lebih akurat
+                    const totalSteps = this.exercises.length * 2 - 1;
+                    const completedSteps = this.isResting ? (this.currentIndex * 2) + 1 : this.currentIndex * 2;
+                    return (completedSteps / totalSteps) * 100;
                 },
 
                 setStep() {
@@ -128,6 +140,7 @@
                     this.isPaused = false;
                     this.interval = setInterval(() => {
                         this.timer--;
+                        this.totalTimeSpent++;
                         if (this.timer <= 0) {
                             this.nextStep();
                         }
@@ -147,45 +160,46 @@
                     clearInterval(this.interval);
                     this.isPaused = true;
 
-                    if (!this.isResting) { // Selesai latihan, mulai istirahat (jika bukan latihan terakhir)
+                    if (!this.isResting) {
                         if(this.currentIndex < this.exercises.length - 1) {
                             this.isResting = true;
                             this.timer = this.restDuration;
                         } else {
                             this.finishWorkout();
                         }
-                    } else { // Selesai istirahat, mulai latihan berikutnya
+                    } else {
                         this.currentIndex++;
                         this.setStep();
                     }
                 },
 
-  
-  finishWorkout() {
-                this.isFinished = true;
-                clearInterval(this.interval);
+                finishWorkout() {
+                    this.isFinished = true;
+                    clearInterval(this.interval);
 
-                // Kirim data ke server
-                // Kirim data ke server
-fetch('{{ route('workout.log.store') }}', { 
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    },
-                    body: JSON.stringify({
-                        jadwal_id: this.jadwalId,
-                        duration_seconds: this.totalTimeSpent
+                    // PERBAIKAN 4: Menggunakan nama route yang benar
+                    fetch('{{ route('workout.log.store') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        },
+                        body: JSON.stringify({
+                            jadwal_id: this.jadwalId,
+                            duration_seconds: this.totalTimeSpent
+                        })
                     })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Log saved:', data.message);
-                })
-                .catch(error => {
-                    console.error('Error logging workout:', error);
-                });
-            },
+                    .then(response => {
+                        if (!response.ok) throw new Error('Network response was not ok');
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Log saved:', data.message);
+                    })
+                    .catch(error => {
+                        console.error('Error logging workout:', error);
+                    });
+                },
 
                 formatTime(seconds) {
                     const mins = Math.floor(seconds / 60);

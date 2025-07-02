@@ -3,55 +3,36 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\JadwalResource\Pages;
+use App\Filament\Resources\JadwalResource\RelationManagers; // <-- Tambahkan ini
 use App\Models\Jadwal;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TimePicker;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Tables\Columns\TextColumn;
-use App\Models\Workout;
-
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class JadwalResource extends Resource
 {
     protected static ?string $model = Jadwal::class;
 
-    // ✅ Tambahan permintaan
     protected static ?string $navigationIcon = 'heroicon-o-calendar-days';
     protected static ?string $navigationGroup = 'Workout';
     protected static ?string $modelLabel = 'Jadwal Workout';
     protected static ?int $navigationSort = 2;
 
-
+    /**
+     * PERBAIKAN 1: Form sekarang untuk membuat "Rencana Latihan", bukan satu gerakan.
+     */
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                TextInput::make('nama_workout')->required(),
-                Select::make('kategori')
-                    ->options([
-                        'Bodyweight'   => 'Bodyweight Workout',
-                        'No Equipment' => 'Workout Tanpa Alat',
-                        'HIIT'         => 'High Intensity Interval Training (HIIT)',
-                        'Core'         => 'Latihan Core / Perut',
-                        'Cardio Ringan'=> 'Cardio Ringan di Kamar',
-                        'Stretching'   => 'Stretching & Peregangan',
-                        'Yoga'         => 'Yoga Ringan di Kamar',
-                        'Tabata'       => 'Tabata Workout',
-                        'Full Body'    => 'Full Body Workout',
-                        'Morning Boost'=> 'Workout Pagi Ringan',
-                        'Sleep Prep'   => 'Peregangan Sebelum Tidur',
-                        'Short Break'  => 'Workout Singkat 5-10 Menit',
-                        'Low Impact'   => 'Low Impact (Tidak Lompat)',
-                    ])
-                    ->required(),
-                TimePicker::make('waktu_mulai')->required(),
-                TimePicker::make('waktu_selesai')->required(),
-                Select::make('hari')
+                Forms\Components\TextInput::make('nama_jadwal')
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\Select::make('hari')
                     ->options([
                         'Senin' => 'Senin',
                         'Selasa' => 'Selasa',
@@ -62,36 +43,54 @@ class JadwalResource extends Resource
                         'Minggu' => 'Minggu',
                     ])
                     ->required(),
+                Forms\Components\Textarea::make('deskripsi')
+                    ->columnSpanFull(),
             ]);
     }
 
+    /**
+     * PERBAIKAN 2: Tabel sekarang menampilkan daftar "Rencana Latihan".
+     */
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                TextColumn::make('nama_workout')->label('Workout')->searchable(),
-                TextColumn::make('kategori')->sortable(),
-                TextColumn::make('hari')->sortable(),
-                TextColumn::make('waktu_mulai')->label('Mulai')->time(),
-                TextColumn::make('waktu_selesai')->label('Selesai')->time(),
+                Tables\Columns\TextColumn::make('nama_jadwal')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('hari')
+                    ->sortable(),
+                // Menampilkan jumlah gerakan di dalam setiap jadwal
+                Tables\Columns\TextColumn::make('workouts_count')
+                    ->counts('workouts')
+                    ->label('Jumlah Gerakan'),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                // Bisa ditambahkan filter hari atau kategori
+                //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
             ]);
     }
-
+    
+    /**
+     * PERBAIKAN 3: Mendaftarkan Relation Manager untuk mengelola "isi" jadwal.
+     */
     public static function getRelations(): array
     {
-        return [];
+        return [
+            RelationManagers\WorkoutsRelationManager::class,
+        ];
     }
-
+    
     public static function getPages(): array
     {
         return [
@@ -99,5 +98,5 @@ class JadwalResource extends Resource
             'create' => Pages\CreateJadwal::route('/create'),
             'edit' => Pages\EditJadwal::route('/{record}/edit'),
         ];
-    }
+    }    
 }

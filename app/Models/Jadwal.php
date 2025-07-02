@@ -1,25 +1,29 @@
 <?php
+// File: app/Models/Jadwal.php
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Jadwal extends Model
 {
     use HasFactory;
 
-    // Sesuaikan dengan kolom yang ada di migrasi
+    /**
+     * Sesuaikan dengan kolom yang baru di migrasi.
+     */
     protected $fillable = [
-        'nama_workout',
-        'kategori',
+        'nama_jadwal',
         'hari',
-        'waktu_mulai',
-        'waktu_selesai',
-        // 'nama_jadwal', // Hapus ini jika tidak ada kolomnya di database
+        'deskripsi',
     ];
 
-    public function workouts()
+    /**
+     * Relasi ini sudah benar. Satu Jadwal punya banyak Workout.
+     */
+    public function workouts(): HasMany
     {
         return $this->hasMany(Workout::class, 'jadwal_id');
     }
