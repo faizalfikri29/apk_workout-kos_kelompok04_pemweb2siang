@@ -18,13 +18,14 @@
 </head>
 <body class="font-sans antialiased bg-gray-900 text-gray-200">
     <div 
-        class="container mx-auto p-4 md:p-8"
-        x-data="workoutSession({
-            exercises: {{ $jadwal->workouts->map(function($w) { return ['name' => $w->nama_workout, 'duration' => $w->durasi_menit * 60, 'tutorial' => $w->tutorial->gambar_url ?? '']; })->toJson() }},
-            restDuration: 30
-        })"
-        x-cloak
-    >
+    class="container mx-auto p-4 md:p-8"
+    x-data="workoutSession({
+        jadwalId: {{ $jadwal->id }},
+        exercises: {{ $jadwal->workouts->map(function($w) { return ['name' => $w->nama_workout, 'duration' => $w->durasi_menit * 60, 'tutorial' => $w->tutorial->gambar_url ?? '']; })->toJson() }},
+        restDuration: 30
+    })"
+    x-cloak
+>
         <div class="text-center mb-8">
             <h1 class="text-3xl md:text-4xl font-bold">{{ $jadwal->nama_jadwal }}</h1>
             <p class="text-lg text-gray-400" x-text="statusText"></p>
@@ -165,7 +166,8 @@
                 clearInterval(this.interval);
 
                 // Kirim data ke server
-                fetch('{{ route('workout.session.log') }}', {
+                // Kirim data ke server
+fetch('{{ route('workout.log.store') }}', { 
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

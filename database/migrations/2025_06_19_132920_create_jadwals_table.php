@@ -12,15 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('jadwals', function (Blueprint $table) {
-    $table->id();
-   $table->string('workout');
-    $table->string('kategori');
-    $table->string('hari');
-    $table->time('mulai');
-    $table->time('selesai');
-    $table->timestamps();
-});
-
+            $table->id();
+            // DIUBAH: dari 'workout' menjadi 'nama_workout'
+            $table->string('nama_workout'); 
+            $table->string('kategori');
+            $table->string('hari');
+            // DIUBAH: dari 'mulai' menjadi 'waktu_mulai'
+            $table->time('waktu_mulai'); 
+            // DIUBAH: dari 'selesai' menjadi 'waktu_selesai'
+            $table->time('waktu_selesai'); 
+            $table->timestamps();
+        });
     }
 
     /**

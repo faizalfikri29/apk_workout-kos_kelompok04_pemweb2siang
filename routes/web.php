@@ -10,6 +10,8 @@ use App\Models\Achievement;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
 
+
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -22,6 +24,8 @@ Route::get('/', function () {
     $jadwals = Jadwal::all()->groupBy('hari');
     return view('welcome', compact('tutorials', 'jadwals', 'workoutOfTheDay'));
 });
+
+
 
 Route::get('/dashboard', function () {
     $user = Auth::user();
