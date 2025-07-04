@@ -3,9 +3,13 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Widgets\StatsOverview;
+use App\Filament\Widgets\UsersChart;
+use App\Filament\Widgets\WorkoutCategoryChart;
+use App\Http\Middleware\CheckAdminRole;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationGroup;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -28,15 +32,15 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
-            ->registration() // <-- 1. Tambahkan halaman registrasi jika perlu
-            ->passwordReset() // <-- 2. Tambahkan fitur reset password
-            ->profile()       // <-- 3. Tambahkan halaman profil pengguna
+            ->registration()
+            ->passwordReset()
+            ->profile()
             ->colors([
                 'primary' => Color::Amber,
             ])
-            ->brandName('Workout Kos') // <-- 4. Branding: Nama Panel
-            ->brandLogo(asset('images/logo.svg')) // <-- 4. Branding: Logo (opsional)
-            ->favicon(asset('images/favicon.png')) // <-- 4. Branding: Favicon (opsional)
+            ->brandName('Workout Kos')
+            ->brandLogo(asset('images/logo.svg'))
+            ->favicon(asset('images/favicon.png'))
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
@@ -44,10 +48,9 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                // Gabungkan semua widget dalam satu array
-                Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
-                StatsOverview::class, // Widget kustom Anda
+                StatsOverview::class,
+                UsersChart::class,
+                WorkoutCategoryChart::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -59,13 +62,21 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                CheckAdminRole::class,
             ])
             ->authMiddleware([
                 Authenticate::class,
             ])
-            ->navigation() // <-- 5. Aktifkan kustomisasi navigasi
-            ->sidebarCollapsibleOnDesktop() // <-- 6. Sidebar bisa di-collapse di desktop
-            ->maxContentWidth('full') // <-- 7. Atur lebar konten maksimal
-            ->darkMode(true); // <-- 8. Aktifkan toggle dark mode
+            ->navigationGroups([
+                NavigationGroup::make()
+                    ->label('Manajemen Konten'),
+                NavigationGroup::make()
+                    ->label('Aktivitas Pengguna'),
+                NavigationGroup::make()
+                    ->label('Manajemen Pengguna'),
+            ])
+            ->sidebarCollapsibleOnDesktop()
+            ->maxContentWidth('full')
+            ->darkMode(true);
     }
 }

@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('kategori_workouts', function (Blueprint $table) {
             $table->id();
-            $table->string('nama_kategori');
+            $table->string('name'); // Pastikan kolom ini bernama 'name'
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }

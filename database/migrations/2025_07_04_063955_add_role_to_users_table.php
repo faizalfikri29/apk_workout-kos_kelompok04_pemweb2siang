@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('tutorials', function (Blueprint $table) {
-        $table->string('gambar_url')->nullable()->after('judul');        });
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('role')->default('user'); // 'admin' or 'user'
+        });
     }
 
     /**
@@ -20,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('tutorials', function (Blueprint $table) {
-            //
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('role');
         });
     }
 };

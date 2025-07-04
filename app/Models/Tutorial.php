@@ -2,15 +2,35 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Tutorial extends Model
 {
+    use HasFactory;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
-        'judul',
+        'nama_tutorial',
+        'deskripsi_tutorial',
+        'url_video',
+        'kategori_workout_id',
         'gambar_url',
-        'kategori',
-        'video_url',
-        'instruksi',
+        'deksripsi_tutorial',
     ];
+
+    /**
+     * Get the kategoriWorkout that owns the Tutorial.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function kategoriWorkout(): BelongsTo
+    {
+        return $this->belongsTo(KategoriWorkout::class, 'kategori_workout_id');
+    }
 }

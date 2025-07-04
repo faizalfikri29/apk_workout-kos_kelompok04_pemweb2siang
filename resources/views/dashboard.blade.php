@@ -32,7 +32,7 @@
             ">
                 {{-- Kartu Total Sesi --}}
                 <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg flex items-center space-x-4 transition-all duration-500 opacity-0 translate-y-4 hover:shadow-xl hover:-translate-y-1">
-                    <div class="bg-blue-100 dark:bg-blue-900 p-3 rounded-xl">@svg('heroicon-o-play-circle', 'h-8 w-8 text-blue-500')</div>
+                    <div class="bg-blue-100 dark:bg-blue-900 p-3 rounded-xl"><x-heroicon-o-play-circle class="h-8 w-8 text-blue-500" /></div>
                     <div>
                         <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">Total Sesi</p>
                         <p class="text-3xl font-bold text-gray-800 dark:text-gray-100" x-data="counter({{ $stats['totalSesi'] ?? 0 }})" x-text="Math.round(current)"></p>
@@ -40,7 +40,7 @@
                 </div>
                 {{-- Kartu Total Menit --}}
                 <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg flex items-center space-x-4 transition-all duration-500 opacity-0 translate-y-4 hover:shadow-xl hover:-translate-y-1">
-                    <div class="bg-green-100 dark:bg-green-900 p-3 rounded-xl">@svg('heroicon-o-clock', 'h-8 w-8 text-green-500')</div>
+                    <div class="bg-green-100 dark:bg-green-900 p-3 rounded-xl"><x-heroicon-o-clock class="h-8 w-8 text-green-500" /></div>
                     <div>
                         <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">Total Menit</p>
                         <p class="text-3xl font-bold text-gray-800 dark:text-gray-100" x-data="counter({{ $stats['totalMenit'] ?? 0 }})" x-text="Math.round(current)"></p>
@@ -48,11 +48,11 @@
                 </div>
                 {{-- Kartu Workout Streak --}}
                 <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg flex items-center space-x-4 transition-all duration-500 opacity-0 translate-y-4 hover:shadow-xl hover:-translate-y-1">
-                    <div class="bg-orange-100 dark:bg-orange-900 p-3 rounded-xl">@svg('heroicon-o-fire', 'h-8 w-8 text-orange-500')</div>
+                    <div class="bg-orange-100 dark:bg-orange-900 p-3 rounded-xl"><x-heroicon-o-fire class="h-8 w-8 text-orange-500" /></div>
                     <div>
                         <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">Workout Streak</p>
                         <p class="text-3xl font-bold text-gray-800 dark:text-gray-100">
-                           <span x-data="counter({{ $stats['streak'] ?? 0 }})" x-text="Math.round(current)"></span> <span class="text-base font-medium">Hari</span>
+                            <span x-data="counter({{ $stats['streak'] ?? 0 }})" x-text="Math.round(current)"></span> <span class="text-base font-medium">Hari</span>
                         </p>
                     </div>
                 </div>
@@ -83,7 +83,7 @@
                                 </div>
                                 <a href="{{ route('workout.session.start', $latihanHarian->id) }}" class="mt-6 inline-flex items-center justify-center w-full px-6 py-4 bg-white border border-transparent rounded-xl font-bold text-indigo-700 uppercase tracking-widest hover:bg-indigo-100 transition text-lg shadow-lg animate-pulse hover:animate-none">
                                     Mulai Latihan Sekarang!
-                                    @svg('heroicon-o-arrow-right', 'w-6 h-6 ml-3')
+                                    <x-heroicon-o-arrow-right class="w-6 h-6 ml-3" />
                                 </a>
                             </div>
                         </div>
@@ -94,10 +94,10 @@
                                 <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-200">Hari Istirahat!</h3>
                                 <p class="mt-2 text-gray-600 dark:text-gray-300">Tubuhmu butuh waktu untuk pulih. Manfaatkan hari ini untuk istirahat.</p>
                                 <a href="#" class="mt-4 inline-flex items-center text-indigo-600 dark:text-indigo-400 font-semibold">
-                                    Lihat Semua Jadwal Latihan @svg('heroicon-o-arrow-right', 'w-4 h-4 ml-1')
+                                    Lihat Semua Jadwal Latihan <x-heroicon-o-arrow-right class="w-4 h-4 ml-1" />
                                 </a>
                             </div>
-                            @svg('heroicon-o-sparkles', 'h-24 w-24 text-yellow-400 ml-8 opacity-50 hidden sm:block')
+                            <x-heroicon-o-sparkles class="h-24 w-24 text-yellow-400 ml-8 opacity-50 hidden sm:block" />
                         </div>
                     @endif
                     
@@ -121,35 +121,35 @@
                 {{-- Kolom Kanan --}}
                 <div class="lg:col-span-1 space-y-8" x-data x-init="
                      $el.childNodes.forEach((node, i) => {
-                        if (node.nodeType === 1) {
-                            setTimeout(() => { node.classList.remove('opacity-0', 'translate-y-4') }, 400 + (i * 100));
-                        }
-                    })
+                         if (node.nodeType === 1) {
+                             setTimeout(() => { node.classList.remove('opacity-0', 'translate-y-4') }, 400 + (i * 100));
+                         }
+                     })
                 ">
                     {{-- Kalender --}}
                     <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-2xl transition-all duration-500 opacity-0 translate-y-4" x-data="workoutCalendar({ workoutDates: {{ json_encode($workoutDates ?? []) }} })" x-cloak>
                         <div class="p-6 text-gray-900 dark:text-gray-100">
                              <div class="flex justify-between items-center">
-                                <h3 class="text-lg font-semibold" x-text="`${monthNames[month]} ${year}`"></h3>
-                                <div>
-                                    <button @click="prevMonth()" class="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">&lt;</button>
-                                    <button @click="nextMonth()" class="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">&gt;</button>
-                                </div>
-                            </div>
-                            <div class="mt-4 grid grid-cols-7 gap-2 text-center text-xs">
-                                <template x-for="day in days" :key="day"><div class="text-gray-500 font-medium" x-text="day"></div></template>
-                                <template x-for="blankday in blankdays"><div></div></template>
-                                <template x-for="date in no_of_days" :key="date">
-                                    <div class="w-full h-8 flex items-center justify-center rounded-full"
-                                         :class="{
-                                            'bg-green-500 text-white font-bold': isWorkoutDay(date),
-                                            'bg-indigo-600 text-white': isToday(date) && isWorkoutDay(date),
-                                            'ring-2 ring-indigo-500': isToday(date) && !isWorkoutDay(date)
-                                         }"
-                                         x-text="date">
-                                    </div>
-                                </template>
-                            </div>
+                                 <h3 class="text-lg font-semibold" x-text="`${monthNames[month]} ${year}`"></h3>
+                                 <div>
+                                     <button @click="prevMonth()" class="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">&lt;</button>
+                                     <button @click="nextMonth()" class="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">&gt;</button>
+                                 </div>
+                             </div>
+                             <div class="mt-4 grid grid-cols-7 gap-2 text-center text-xs">
+                                 <template x-for="day in days" :key="day"><div class="text-gray-500 font-medium" x-text="day"></div></template>
+                                 <template x-for="blankday in blankdays"><div></div></template>
+                                 <template x-for="date in no_of_days" :key="date">
+                                     <div class="w-full h-8 flex items-center justify-center rounded-full"
+                                          :class="{
+                                             'bg-green-500 text-white font-bold': isWorkoutDay(date),
+                                             'bg-indigo-600 text-white': isToday(date) && isWorkoutDay(date),
+                                             'ring-2 ring-indigo-500': isToday(date) && !isWorkoutDay(date)
+                                          }"
+                                          x-text="date">
+                                     </div>
+                                 </template>
+                             </div>
                         </div>
                     </div>
 
@@ -158,7 +158,9 @@
                     <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg transition-all duration-500 opacity-0 translate-y-4">
                         <h4 class="text-lg font-semibold mb-3 text-gray-900 dark:text-gray-100">Menuju Lencana Berikutnya</h4>
                         <div class="flex items-center space-x-4">
-                            <div class="flex-shrink-0">@svg($nextAchievement->icon, 'h-12 w-12 text-gray-400 dark:text-gray-500')</div>
+                            <div class="flex-shrink-0">
+                                <x-dynamic-component :component="'heroicon-s-' . $nextAchievement->icon" class="h-12 w-12 text-gray-400 dark:text-gray-500" />
+                            </div>
                             <div class="w-full">
                                 <p class="font-semibold text-gray-800 dark:text-gray-200">{{ $nextAchievement->name }}</p>
                                 <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ $nextAchievement->description }}</p>
@@ -182,9 +184,9 @@
                                         @php $unlocked = isset($userAchievementIds) && in_array($achievement->id, $userAchievementIds); @endphp
                                         <div class="text-center" title="{{ $achievement->description }}">
                                             <div class="relative">
-                                                @svg($achievement->icon, 'h-12 w-12 mx-auto transition-all ' . ($unlocked ? 'text-yellow-400 hover:scale-110' : 'text-gray-300 dark:text-gray-600 opacity-60'))
+                                                <x-dynamic-component :component="'heroicon-s-' . $achievement->icon" class="h-12 w-12 mx-auto transition-all {{ $unlocked ? 'text-yellow-400 hover:scale-110' : 'text-gray-300 dark:text-gray-600 opacity-60' }}" />
                                                 @if(!$unlocked)
-                                                    @svg('heroicon-s-lock-closed', 'h-5 w-5 absolute bottom-0 right-2 text-gray-400 dark:text-gray-500')
+                                                    <x-heroicon-s-lock-closed class="h-5 w-5 absolute bottom-0 right-2 text-gray-400 dark:text-gray-500" />
                                                 @endif
                                             </div>
                                             <p class="text-xs mt-2 truncate font-semibold {{ $unlocked ? '' : 'text-gray-400 dark:text-gray-500' }}">{{ $achievement->name }}</p>
@@ -205,7 +207,9 @@
         <div x-show="newAchievement" x-transition @click.away="newAchievement = false" class="fixed inset-0 bg-black/75 flex items-center justify-center p-4 z-50" x-cloak>
             <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl text-center p-8 max-w-sm mx-auto" @click.stop>
                 <h3 class="text-sm font-semibold uppercase text-yellow-500 tracking-wider">Lencana Baru Terbuka!</h3>
-                <div class="my-4">@svg(session('newAchievement')->icon, 'h-24 w-24 mx-auto text-yellow-400 animate-pulse')</div>
+                <div class="my-4">
+                    <x-dynamic-component :component="'heroicon-s-' . session('newAchievement')->icon" class="h-24 w-24 mx-auto text-yellow-400 animate-pulse" />
+                </div>
                 <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200">{{ session('newAchievement')->name }}</h2>
                 <p class="text-gray-600 dark:text-gray-300 mt-2">{{ session('newAchievement')->description }}</p>
                 <button @click="newAchievement = false" class="mt-6 w-full px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-500 transition">Luar Biasa!</button>
@@ -238,7 +242,7 @@ document.addEventListener('alpine:init', () => {
         }
     }));
 
-    // Komponen untuk kalender (INI YANG SEBELUMNYA HILANG)
+    // Komponen untuk kalender
     Alpine.data('workoutCalendar', (options) => ({
         month: '', year: '', no_of_days: [], blankdays: [],
         days: ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'],

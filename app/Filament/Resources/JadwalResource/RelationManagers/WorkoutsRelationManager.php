@@ -1,9 +1,8 @@
 <?php
-// File: app/Filament/Resources/JadwalResource/RelationManagers/WorkoutsRelationManager.php
 
 namespace App\Filament\Resources\JadwalResource\RelationManagers;
 
-use App\Models\Tutorial; // <-- Pastikan ini ada
+use App\Models\Tutorial;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -18,22 +17,23 @@ class WorkoutsRelationManager extends RelationManager
     {
         return $form
             ->schema([
+                // Menggunakan ->relationship() yang merupakan cara yang benar di Filament
+                Forms\Components\Select::make('tutorial_id')
+                    ->label('Pilih Workout dari Tutorial')
+                    ->relationship(name: 'tutorial', titleAttribute: 'nama_tutorial')
+                    ->searchable()
+                    ->preload()
+                    ->required(),
+
                 Forms\Components\TextInput::make('nama_workout')
-                    ->required()
+                    ->label('Nama Workout')
+                    ->helperText('Akan diisi otomatis dari tutorial jika dikosongkan.')
                     ->maxLength(255),
+
                 Forms\Components\TextInput::make('durasi_menit')
                     ->required()
-                    ->numeric()
-                    ->label('Durasi (Menit)'),
-                
-                // INI ADALAH CARA YANG BENAR DAN AKAN MEMPERBAIKI ERROR
-               Forms\Components\Select::make('tutorial_id')
-    ->label('Tutorial Terkait')
-    // BENAR - karena menggunakan nama kolom yang ada di database, yaitu 'judul'
-->options(Tutorial::whereNotNull('judul')->pluck('judul', 'id'))
-    ->searchable()
-    ->nullable(),
-            ])->columns(1);
+                    ->numeric(),
+            ]);
     }
 
     public function table(Table $table): Table
@@ -42,20 +42,22 @@ class WorkoutsRelationManager extends RelationManager
             ->recordTitleAttribute('nama_workout')
             ->columns([
                 Tables\Columns\TextColumn::make('nama_workout'),
-                Tables\Columns\TextColumn::make('durasi_menit')
-                    ->label('Durasi')
-                    ->suffix(' menit')
-                    ->sortable(),
-                // Menampilkan nama tutorial terkait di tabel
-                Tables\Columns\TextColumn::make('tutorial.nama_tutorial')
-                    ->label('Tutorial')
-                    ->placeholder('Tidak ada'),
+                Tables\Columns\TextColumn::make('durasi_menit'),
+                Tables\Columns\TextColumn::make('tutorial.nama_tutorial')->label('Dari Tutorial'),
             ])
             ->filters([
                 //
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                Tables\Actions\CreateAction::make()
+                    // Mengisi nama_workout dari tutorial secara otomatis saat membuat
+                    ->mutateFormDataUsing(function (array $data): array {
+                        if (empty($data['nama_workout']) && !empty($data['tutorial_id'])) {
+                            $tutorial = Tutorial::find($data['tutorial_id']);
+                            $data['nama_workout'] = $tutorial?->nama_tutorial;
+                        }
+                        return $data;
+                    }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

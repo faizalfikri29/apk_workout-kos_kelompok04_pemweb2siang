@@ -6,24 +6,16 @@ use App\Filament\Resources\TutorialResource\Pages;
 use App\Models\Tutorial;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Grid;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\BadgeColumn;
-use Filament\Tables\Columns\ImageColumn;
 
 class TutorialResource extends Resource
 {
     protected static ?string $model = Tutorial::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-video-camera';
-    protected static ?string $navigationGroup = 'Tutorial';
+    protected static ?string $navigationGroup = 'Manajemen Konten';
     protected static ?string $modelLabel = 'Tutorial Workout';
     protected static ?int $navigationSort = 1;
 
@@ -32,34 +24,33 @@ class TutorialResource extends Resource
     {
         return $form
             ->schema([
-                Grid::make(2)->schema([
-                    TextInput::make('judul')
+                Forms\Components\Grid::make(2)->schema([
+                    Forms\Components\TextInput::make('nama_tutorial')
                         ->label('Judul Workout')
                         ->placeholder('Contoh: Cardio Ringan Pagi')
                         ->required(),
 
-                    FileUpload::make('gambar_url')
+                    Forms\Components\FileUpload::make('gambar_url')
                         ->image()
                         ->directory('tutorials')
                         ->label('Upload Gambar')
                         ->required(),
                 ]),
 
-                Select::make('kategori')
+                Forms\Components\Select::make('kategori_workout_id')
                     ->label('Kategori')
-                    ->options([
-                        'Cardio' => '💓 Cardio',
-                        'Strength' => '💪 Strength',
-                        'Stretching' => '🧘 Stretching',
-                    ])
+                    ->relationship('kategoriWorkout', 'name')
+                    ->searchable()
+                    ->preload()
                     ->required(),
 
-                TextInput::make('video_url')
+                Forms\Components\TextInput::make('url_video')
                     ->label('Link Video Tutorial')
                     ->placeholder('https://youtube.com/...')
+                    ->url()
                     ->required(),
 
-                Textarea::make('instruksi')
+                Forms\Components\Textarea::make('deskripsi_tutorial')
                     ->label('Langkah-langkah Workout')
                     ->rows(6)
                     ->placeholder("- Langkah 1\n- Langkah 2\n- Langkah 3")
@@ -71,41 +62,40 @@ class TutorialResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('judul')
-                    ->label('Judul Workout')
-                    ->description(fn ($record) => $record->kategori)
-                    ->sortable()
-                    ->searchable(),
-
-                ImageColumn::make('gambar_url')
+                Tables\Columns\ImageColumn::make('gambar_url')
                     ->label('Gambar')
                     ->size(60),
-
-                BadgeColumn::make('kategori')
-                    ->colors([
-                        'warning' => 'Cardio',
-                        'danger' => 'Strength',
-                        'success' => 'Stretching',
-                    ]),
-
-                TextColumn::make('video_url')
+                // Menggunakan 'nama_tutorial' yang merupakan nama kolom yang benar
+                Tables\Columns\TextColumn::make('nama_tutorial')
+                    ->label('Judul Workout')
+                    ->description(fn (Tutorial $record): string => $record->kategoriWorkout->name ?? '')
+                    ->sortable()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('kategoriWorkout.name')
+                    ->label('Kategori')
+                    ->badge()
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('url_video')
                     ->label('Video Tutorial')
-                    ->url(fn ($record) => $record->video_url, true)
-                    ->openUrlInNewTab()
+                    ->url(fn (Tutorial $record): string => $record->url_video)
                     ->limit(30),
 
-                TextColumn::make('instruksi')
-                    ->label('Instruksi')
+                 Tables\Columns\TextColumn::make('deskripsi_tutorial')
+                    ->label('Intruksi')
                     ->limit(50)
-                    ->wrap(),
+                    ->wrap(),  
             ])
-            ->defaultSort('judul')
+            // Mengatur default sort ke kolom yang benar
+            ->defaultSort('nama_tutorial', 'asc')
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
             ]);
     }
 
