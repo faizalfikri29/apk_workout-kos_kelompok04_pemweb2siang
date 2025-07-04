@@ -27,14 +27,12 @@ class WorkoutsRelationManager extends RelationManager
                     ->label('Durasi (Menit)'),
                 
                 // INI ADALAH CARA YANG BENAR DAN AKAN MEMPERBAIKI ERROR
-                Forms\Components\Select::make('tutorial_id')
-                    ->label('Tutorial Terkait')
-                    // Mengambil data dari tabel tutorials.
-                    // Menampilkan 'nama_tutorial' kepada user.
-                    // Mengirim 'id' (angka) ke database.
-                    ->options(Tutorial::all()->pluck('nama_tutorial', 'id')) 
-                    ->searchable()
-                    ->nullable(),
+               Forms\Components\Select::make('tutorial_id')
+    ->label('Tutorial Terkait')
+    // BENAR - karena menggunakan nama kolom yang ada di database, yaitu 'judul'
+->options(Tutorial::whereNotNull('judul')->pluck('judul', 'id'))
+    ->searchable()
+    ->nullable(),
             ])->columns(1);
     }
 

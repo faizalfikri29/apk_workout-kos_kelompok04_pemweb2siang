@@ -26,6 +26,12 @@ class UserResource extends Resource
             ->schema([
                 Forms\Components\TextInput::make('name')->required(),
                 Forms\Components\TextInput::make('email')->email()->required(),
+                forms\Components\TextInput::make('password')
+                    ->password()
+                    ->required()
+                    ->minLength(8)
+                    ->dehydrateStateUsing(fn ($state) => bcrypt($state))
+                    ->visibleOn('create'),
             ]);
     }
 

@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\User\WorkoutController;
+use App\Http\Controllers\DashboardController;
 use App\Models\Tutorial;
 use App\Models\Jadwal;
 use App\Models\WorkoutLog;
@@ -123,5 +124,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/workout/session/{jadwal}', [WorkoutController::class, 'startSession'])->name('workout.session.start');
     Route::post('/workout/log', [WorkoutController::class, 'storeLog'])->name('workout.log.store'); 
 });
+
+
 
 require __DIR__.'/auth.php';
