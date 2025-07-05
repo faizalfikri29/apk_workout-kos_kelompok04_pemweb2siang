@@ -14,6 +14,8 @@ class Workout extends Model
     protected $fillable = [
         'jadwal_id',
         'nama_workout',
+        'name',
+        'kategori_workout_id',
         'durasi_menit',
         'tutorial_id', // <-- Tambahkan ini
     ];
@@ -21,6 +23,10 @@ class Workout extends Model
     public function jadwal(): BelongsTo
     {
         return $this->belongsTo(Jadwal::class);
+    }
+     public function kategoriWorkout(): BelongsTo
+    {
+        return $this->belongsTo(KategoriWorkout::class); // Sesuaikan dengan nama model kategori Anda
     }
 
     /**

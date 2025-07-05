@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Models\KategoriWorkout; 
 use App\Filament\Resources\TutorialResource\Pages;
 use App\Models\Tutorial;
 use Filament\Forms;
@@ -9,11 +10,13 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use App\Models\Workout; // Pastikan ini adalah model Workout Anda
+use Filament\Tables\Columns\TextColumn;
 
 class TutorialResource extends Resource
 {
     protected static ?string $model = Tutorial::class;
-
+    protected static ?string $navigationLabel = 'Tutorial Workout';
     protected static ?string $navigationIcon = 'heroicon-o-video-camera';
     protected static ?string $navigationGroup = 'Manajemen Konten';
     protected static ?string $modelLabel = 'Tutorial Workout';
@@ -25,6 +28,9 @@ class TutorialResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Grid::make(2)->schema([
+                    // Forms\Components\TextInput::make('name') // Kolom input 'name' dari Tutorial Workout
+                    // ->required()
+                    // ->maxLength(255),
                     Forms\Components\TextInput::make('nama_tutorial')
                         ->label('Judul Workout')
                         ->placeholder('Contoh: Cardio Ringan Pagi')
@@ -39,7 +45,7 @@ class TutorialResource extends Resource
 
                 Forms\Components\Select::make('kategori_workout_id')
                     ->label('Kategori')
-                    ->relationship('kategoriWorkout', 'name')
+                    ->options(KategoriWorkout::all()->pluck('name', 'id'))
                     ->searchable()
                     ->preload()
                     ->required(),
