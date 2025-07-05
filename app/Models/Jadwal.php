@@ -27,4 +27,10 @@ class Jadwal extends Model
     {
         return $this->hasMany(Workout::class, 'jadwal_id');
     }
+
+    public function workoutLogs()
+{
+    return $this->hasMany(WorkoutLog::class);
+}
+
 }
