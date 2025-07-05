@@ -161,6 +161,20 @@ class DashboardController extends Controller
         $allAchievements = Achievement::all();
         $userAchievementIds = $user->achievements()->pluck('achievements.id')->toArray();
 
+        // Menentukan lencana berikutnya dan progressnya
+        $nextAchievement = null;
+        $nextAchievementProgress = 0;
+        $firstUnachieved = $allAchievements->firstWhere(fn($ach) => !in_array($ach->id, $userAchievementIds));
+        if ($firstUnachieved) {
+            $nextAchievement = $firstUnachieved;
+            if ($nextAchievement->condition_type == 'sessions') {
+                $nextAchievementProgress = ($totalSesi / $nextAchievement->condition_value) * 100;
+            } elseif ($nextAchievement->condition_type == 'streak') {
+                $nextAchievementProgress = ($streak / $nextAchievement->condition_value) * 100;
+            }
+        }
+
+        // Cek dan berikan achievement yang baru terbuka
         foreach ($allAchievements as $achievement) {
             // Hanya periksa lencana yang belum dimiliki.
             if (!in_array($achievement->id, $userAchievementIds)) {

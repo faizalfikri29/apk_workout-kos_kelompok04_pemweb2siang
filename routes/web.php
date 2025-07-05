@@ -6,8 +6,8 @@ use App\Http\Controllers\User\WorkoutController;
 use App\Http\Controllers\DashboardController;
 use App\Models\Tutorial;
 use App\Models\Jadwal;
-use App\Http\Controllers\WorkoutLogController;
 use App\Http\Controllers\WorkoutSessionController;
+use App\Http\Controllers\WorkoutLogController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes

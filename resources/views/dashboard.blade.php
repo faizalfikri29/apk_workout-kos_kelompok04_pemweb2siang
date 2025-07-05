@@ -2,7 +2,7 @@
     {{-- Slot Header dengan Sapaan Dinamis & Kutipan Motivasi --}}
     <x-slot name="header">
         <div>
-            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-500 leading-tight">
                 {{ $greeting ?? 'Halo' }}, {{ Auth::user()->name }}!
             </h2>
             <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 italic">
