@@ -41,6 +41,9 @@ class TutorialResource extends Resource
                     ->label('Kategori')
                     ->relationship('kategoriWorkout', 'name')
                     ->searchable()
+                    ->options(
+                        fn () => \App\Models\KategoriWorkout::all()->pluck('name', 'id')
+                    )
                     ->preload()
                     ->required(),
 

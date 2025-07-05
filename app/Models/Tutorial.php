@@ -32,5 +32,8 @@ class Tutorial extends Model
     public function kategoriWorkout(): BelongsTo
     {
         return $this->belongsTo(KategoriWorkout::class, 'kategori_workout_id');
+        return $this->belongsTo(KategoriWorkout::class);
     }
+    // di Tutorial.php
+
 }

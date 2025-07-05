@@ -1,0 +1,10 @@
+:root {
+    /* ... variabel warna lainnya ... */
+
+    --p-body-background-color: theme(
+        "colors.blue.500"
+    ); /* Ganti dengan warna biru yang Anda inginkan */
+    --f-body-background-color: theme(
+        "colors.blue.500"
+    ); /* Ganti dengan warna biru yang Anda inginkan */
+}

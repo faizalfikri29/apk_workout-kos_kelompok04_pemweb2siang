@@ -36,7 +36,7 @@ class AdminPanelProvider extends PanelProvider
             ->passwordReset()
             ->profile()
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Blue,
             ])
             ->brandName('Workout Kos')
             ->brandLogo(asset('images/logo.svg'))
@@ -73,7 +73,7 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make()
                     ->label('Aktivitas Pengguna'),
                 NavigationGroup::make()
-                    ->label('Manajemen Pengguna'),
+                    ->label('Manajemen Peng guna'),
             ])
             ->sidebarCollapsibleOnDesktop()
             ->maxContentWidth('full')
