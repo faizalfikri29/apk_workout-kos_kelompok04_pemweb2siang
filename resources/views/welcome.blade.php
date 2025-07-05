@@ -13,7 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     
     <script>
@@ -134,7 +134,7 @@
         </div>
         <button @click="isModalOpen = false" class="absolute top-4 right-4 text-white/70 hover:text-white bg-black/30 hover:bg-black/50 p-2 rounded-full transition-all duration-300">
              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
              </svg>
         </button>
     </div>
@@ -159,7 +159,7 @@
                 <a href="#tutorials" class="font-semibold hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Tutorial</a>
                 <a href="#tools" class="font-semibold hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Tools</a>
                 <a href="#jadwal" class="font-semibold hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Jadwal</a>
-                <a href="#community" class="font-semibold hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Komunitas</a>
+                <a href="#anggota" class="font-semibold hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Anggota</a>
                 <a href="#nutrition" class="font-semibold hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Nutrisi</a>
             </div>
             
@@ -226,7 +226,7 @@
             <a href="#tutorials" class="block py-2 font-semibold hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Tutorial</a>
             <a href="#tools" class="block py-2 font-semibold hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Tools</a>
             <a href="#jadwal" class="block py-2 font-semibold hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Jadwal</a>
-            <a href="#community" class="block py-2 font-semibold hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Komunitas</a>
+            <a href="#anggota" class="block py-2 font-semibold hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Anggota</a>
             <a href="#nutrition" class="block py-2 font-semibold hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Nutrisi</a>
             <div class="border-t border-slate-200 dark:border-slate-700 mt-4 pt-4 flex items-center gap-4">
                 <a href="Login" class="flex-1 text-center font-semibold py-3 rounded-lg border-2 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
@@ -279,19 +279,19 @@
                 
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
                     <div class="text-center">
-                        <div class="text-4xl font-black gradient-text mb-2">15K+</div>
+                        <div class="text-4xl font-black gradient-text mb-2">{{ $activeUsersCount }}+</div>
                         <div class="text-slate-600 dark:text-slate-400 font-semibold">Mahasiswa Aktif</div>
                     </div>
                     <div class="text-center">
-                        <div class="text-4xl font-black gradient-text mb-2">200+</div>
+                        <div class="text-4xl font-black gradient-text mb-2">{{ $tutorialsCount }}+</div>
                         <div class="text-slate-600 dark:text-slate-400 font-semibold">Video Tutorial</div>
                     </div>
                     <div class="text-center">
-                        <div class="text-4xl font-black gradient-text mb-2">50+</div>
+                        <div class="text-4xl font-black gradient-text mb-2">{{ $universitiesCount }}+</div>
                         <div class="text-slate-600 dark:text-slate-400 font-semibold">Universitas</div>
                     </div>
                     <div class="text-center">
-                        <div class="text-4xl font-black gradient-text mb-2">4.9⭐</div>
+                        <div class="text-4xl font-black gradient-text mb-2">{{ $userRating }}⭐</div>
                         <div class="text-slate-600 dark:text-slate-400 font-semibold">Rating Pengguna</div>
                     </div>
                 </div>
@@ -327,10 +327,10 @@
             </div>
             
             <div x-data="{ 
-                workoutDays: [],
-                workoutTime: '',
-                selectedWorkouts: []
-            }" class="max-w-4xl mx-auto glass rounded-2xl p-8 shadow-2xl">
+                    workoutDays: [],
+                    workoutTime: '',
+                    selectedWorkouts: []
+                 }" class="max-w-4xl mx-auto glass rounded-2xl p-8 shadow-2xl">
                 <div class="space-y-6">
                     <div>
                         <label class="block text-lg font-semibold mb-2">Pilih Hari Latihan</label>
@@ -391,7 +391,7 @@
                             labels: ['Minggu 1', 'Minggu 2', 'Minggu 3', 'Minggu 4'],
                             datasets: [{
                                 label: 'Jumlah Latihan',
-                                data: [3, 5, 7, 10],
+                                data: [3, 5, 7, 10], // Data ini bisa diisi dari database
                                 borderColor: '#667eea',
                                 backgroundColor: 'rgba(102, 126, 234, 0.2)',
                                 fill: true,
@@ -451,12 +451,12 @@
             </div>
             
             <div x-data="{ 
-                step: 1,
-                time: '',
-                energy: '',
-                space: '',
-                result: ''
-            }" class="max-w-4xl mx-auto glass rounded-2xl p-8 shadow-2xl">
+                    step: 1,
+                    time: '',
+                    energy: '',
+                    space: '',
+                    result: ''
+                 }" class="max-w-4xl mx-auto glass rounded-2xl p-8 shadow-2xl">
                 <div x-show="step === 1">
                     <h3 class="text-2xl font-bold mb-4">Berapa banyak waktu yang kamu miliki?</h3>
                     <div class="flex flex-wrap gap-3">
@@ -505,24 +505,53 @@
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                @foreach($tutorials as $tutorial)
                 <div class="glass rounded-2xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer" 
                      @click="isModalOpen = true; modalTutorial = {
-                         name: 'Morning Energy Boost',
-                         description: 'Mulai hari dengan workout 15 menit untuk meningkatkan energi dan fokus.',
-                         videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+                         name: '{{ $tutorial->nama_tutorial }}',
+                         description: '{{ $tutorial->deskripsi_tutorial }}',
+                         videoUrl: '{{ $tutorial->url_video }}',
                          duration: '15 Menit',
-                         difficulty: 'Pemula'
+                         difficulty: '{{ $tutorial->kategoriWorkout->name ?? 'Semua Level' }}'
                      }">
-                    <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
-                         alt="Morning Workout" class="w-full h-48 object-cover rounded-xl mb-4">
-                    <h3 class="text-xl font-bold text-slate-900 dark:text-white">Morning Energy Boost</h3>
-                    <p class="text-slate-600 dark:text-slate-400">15 menit workout untuk energi pagi</p>
+                    <img src="{{ Storage::url($tutorial->gambar_url) }}" 
+                         alt="{{ $tutorial->nama_tutorial }}" class="w-full h-48 object-cover rounded-xl mb-4">
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white">{{ $tutorial->nama_tutorial }}</h3>
+                    <p class="text-slate-600 dark:text-slate-400">{{ Str::limit($tutorial->deskripsi_tutorial, 40) }}</p>
                 </div>
+                @endforeach
                 </div>
         </div>
     </section>
 
-    <section id="nutrition" class="py-24">
+    <!-- Bagian Anggota Tim -->
+    <section id="anggota" class="py-24">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-5xl font-black text-slate-900 dark:text-white mb-4">👥 Tim Pengembang Kami</h2>
+                <p class="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">Orang-orang hebat di balik layar yang mendedikasikan waktu dan keahliannya untuk Workout-in-Kos.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
+                @foreach($developers as $developer)
+                <div class="text-center group">
+                    <div class="relative w-40 h-40 mx-auto mb-6">
+                        <img src="{{ $developer['imageUrl'] }}" 
+                             alt="Foto {{ $developer['name'] }}" 
+                             class="w-full h-full rounded-full object-cover shadow-lg transform group-hover:scale-110 transition-transform duration-300">
+                        <div class="absolute inset-0 rounded-full border-4 border-indigo-500/50 group-hover:border-indigo-500 transition-all duration-300 scale-110 group-hover:scale-125 opacity-0 group-hover:opacity-100"></div>
+                    </div>
+                    <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-1">{{ $developer['name'] }}</h3>
+                    <p class="text-indigo-600 dark:text-indigo-400 font-semibold mb-3">{{ $developer['role'] }}</p>
+                    <p class="text-slate-600 dark:text-slate-400 max-w-xs mx-auto">{{ $developer['description'] }}</p>
+                </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
+    <!-- Akhir Bagian Anggota Tim -->
+
+    <section id="nutrition" class="py-24 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-slate-800/50 dark:to-indigo-900/20">
         <div class="container mx-auto px-6">
             <div class="text-center mb-12">
                 <h2 class="text-5xl font-black text-slate-900 dark:text-white mb-4">🍎 Tips Nutrisi Mahasiswa</h2>
@@ -530,25 +559,18 @@
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                @foreach($nutritions as $nutrition)
                 <div class="glass rounded-2xl p-6 text-center hover:scale-105 transition-all duration-300 cursor-pointer">
-                    <div class="text-4xl mb-4">🥚</div>
-                    <h3 class="text-xl font-bold mb-2 text-slate-900 dark:text-white">Telur Rebus</h3>
-                    <p class="text-slate-600 dark:text-slate-400">Sumber protein murah, mudah disiapkan</p>
+                    <div class="text-4xl mb-4">{{ $nutrition['icon'] }}</div>
+                    <h3 class="text-xl font-bold mb-2 text-slate-900 dark:text-white">{{ $nutrition['title'] }}</h3>
+                    <p class="text-slate-600 dark:text-slate-400">{{ $nutrition['description'] }}</p>
                 </div>
-                <div class="glass rounded-2xl p-6 text-center hover:scale-105 transition-all duration-300 cursor-pointer">
-                    <div class="text-4xl mb-4">🥗</div>
-                    <h3 class="text-xl font-bold mb-2 text-slate-900 dark:text-white">Sayur Kolplay</h3>
-                    <p class="text-slate-600 dark:text-slate-400">Kombinasi sayur segar dengan saus sederhana</p>
-                </div>
-                <div class="glass rounded-2xl p-6 text-center hover:scale-105 transition-all duration-300 cursor-pointer">
-                    <div class="text-4xl mb-4">🍠</div>
-                    <h3 class="text-xl font-bold mb-2 text-slate-900 dark:text-white">Ubi Panggang</h3>
-                    <p class="text-slate-600 dark:text-slate-400">Karbohidrat sehat untuk energi tahan lama</p>
-                </div>
+                @endforeach
             </div>
         </div>
     </section>
 
+    @if($workoutOfTheDay)
     <section id="fitur" class="py-24">
         <div class="container mx-auto px-6">
             <div class="text-center mb-12">
@@ -559,12 +581,12 @@
             <div class="max-w-6xl mx-auto bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-slate-800/50 dark:to-indigo-900/20 rounded-3xl p-8 lg:p-12 shadow-2xl">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                     <div class="relative">
-                        <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
-                             alt="Morning Workout" class="w-full h-80 object-cover rounded-2xl shadow-xl">
+                        <img src="{{ Storage::url($workoutOfTheDay->gambar_url) }}" 
+                             alt="{{ $workoutOfTheDay->nama_tutorial }}" class="w-full h-80 object-cover rounded-2xl shadow-xl">
                         <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent rounded-2xl"></div>
                         <div class="absolute bottom-4 left-4 text-white">
                             <div class="flex gap-2 mb-2">
-                                <span class="bg-green-500 px-3 py-1 rounded-full text-sm font-semibold">Pemula</span>
+                                <span class="bg-green-500 px-3 py-1 rounded-full text-sm font-semibold">{{ $workoutOfTheDay->kategoriWorkout->name ?? 'Semua Level' }}</span>
                                 <span class="bg-blue-500 px-3 py-1 rounded-full text-sm font-semibold">15 Menit</span>
                             </div>
                         </div>
@@ -576,9 +598,9 @@
                     </div>
                     
                     <div>
-                        <h3 class="text-4xl font-black text-slate-900 dark:text-white mb-4">Morning Energy Boost</h3>
+                        <h3 class="text-4xl font-black text-slate-900 dark:text-white mb-4">{{ $workoutOfTheDay->nama_tutorial }}</h3>
                         <p class="text-lg text-slate-600 dark:text-slate-400 mb-6 leading-relaxed">
-                            Mulai hari dengan workout 15 menit yang akan meningkatkan energi dan fokus untuk kuliah. Perfect untuk yang sering ngantuk di kelas pagi! 😴➡️😎
+                            {{ $workoutOfTheDay->deskripsi_tutorial }}
                         </p>
                         
                         <div class="space-y-4 mb-8">
@@ -617,6 +639,7 @@
             </div>
         </div>
     </section>
+    @endif
 </main>
 
 <script>

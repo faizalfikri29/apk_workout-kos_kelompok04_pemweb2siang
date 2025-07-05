@@ -2,10 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\User\WorkoutController;
 use App\Http\Controllers\DashboardController;
-use App\Models\Tutorial;
-use App\Models\Jadwal;
+use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\WorkoutLogController;
 use App\Http\Controllers\WorkoutSessionController;
 
@@ -14,53 +12,56 @@ use App\Http\Controllers\WorkoutSessionController;
 | Web Routes
 |--------------------------------------------------------------------------
 |
-| File ini sekarang hanya bertanggung jawab untuk memetakan URL ke Controller.
-| Jauh lebih bersih, cepat, dan mudah dikelola.
+| File ini berisi semua rute untuk aplikasi web Anda. Rute-rute ini
+| dimuat oleh RouteServiceProvider dalam sebuah grup yang berisi
+| middleware "web".
 |
 */
 
-// Route untuk Halaman Depan (Welcome Page)
-// Logika sederhana seperti ini masih bisa diterima di file route.
+/**
+ * --------------------------------------------------------------------------
+ * Rute Publik (Dapat diakses tanpa login)
+ * --------------------------------------------------------------------------
+ */
+
+// Rute untuk Halaman Depan (Welcome Page)
+// Logika dipindahkan ke WelcomeController untuk menjaga file rute tetap bersih.
+Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
 
 
-Route::get('/', function () {
-    $tutorials = Tutorial::latest()->take(6)->get();
-    $workoutOfTheDay = Tutorial::inRandomOrder()->first();
-    $jadwals = Jadwal::all()->groupBy('hari');
-    return view('welcome', compact('tutorials', 'jadwals', 'workoutOfTheDay'));
-});
+/**
+ * --------------------------------------------------------------------------
+ * Rute yang Membutuhkan Otentikasi
+ * --------------------------------------------------------------------------
+ */
 
-// Route untuk Dasbor Pengguna
-// --- BAGIAN YANG DIPERBAIKI ---
-// Semua logika kompleks dipindahkan ke DashboardController.
-// Ini memungkinkan route caching dan membuat kode lebih terstruktur.
+// Rute untuk Dasbor Pengguna
+// Pengguna harus login dan emailnya terverifikasi untuk mengakses ini.
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])->name('dashboard');
 
-// Middleware Group untuk semua rute yang membutuhkan otentikasi
+// Grup rute yang memerlukan pengguna untuk login.
 Route::middleware('auth')->group(function () {
-    // Rute untuk Profil Pengguna
+    
+    // Rute untuk Manajemen Profil Pengguna
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // Rute untuk Sesi Latihan dan Logging
-    
-
-Route::middleware(['auth'])->group(function () {
+    // Rute-rute ini telah dirapikan untuk menghindari duplikasi.
     Route::get('/workout/session/{jadwal}', [WorkoutSessionController::class, 'start'])->name('workout.session.start');
-    Route::post('/workout/log', [WorkoutSessionController::class, 'store'])->name('workout.log.store');
-});
-
-
-Route::post('/workout/log', [WorkoutLogController::class, 'store'])->name('workout.log.store');
-
-    Route::get('/workout/session/{jadwal}', [WorkoutSessionController::class, 'start'])->name('workout.session.start');
-Route::post('/workout/session', [WorkoutSessionController::class, 'store'])->name('workout.session.store');
-    Route::get('/workout/session/{jadwal}', [WorkoutController::class, 'startSession'])->name('workout.session.start');
     Route::post('/workout/session', [WorkoutSessionController::class, 'store'])->name('workout.session.store');
-    Route::post('/workout/log', [WorkoutLogController::class, 'store'])->name('workout.log.store')->middleware('auth');
+    Route::post('/workout/log', [WorkoutLogController::class, 'store'])->name('workout.log.store');
+
 });
 
-// Memuat rute otentikasi (login, register, dll.)
+
+/**
+ * --------------------------------------------------------------------------
+ * Rute Otentikasi Bawaan Laravel
+ * --------------------------------------------------------------------------
+ */
+
+// Memuat rute-rute standar untuk otentikasi seperti login, register, dll.
 require __DIR__.'/auth.php';
