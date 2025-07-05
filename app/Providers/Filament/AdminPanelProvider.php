@@ -2,6 +2,9 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Widgets\DailyScheduleChart;
+
+use App\Filament\Widgets\UserRoleChart;
 use App\Filament\Widgets\StatsOverview;
 use App\Filament\Widgets\UsersChart;
 use App\Filament\Widgets\WorkoutCategoryChart;
@@ -49,11 +52,14 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-    StatsOverview::class,
-    UsersChart::class,
-    WorkoutCategoryChart::class,
-    WorkoutLogChart::class, // ⬅️ Tambahkan ini
-])
+                StatsOverview::class,
+                UsersChart::class,
+                WorkoutCategoryChart::class,
+                WorkoutLogChart::class, // ⬅️ Tambahkan ini
+                DailyScheduleChart::class, // ⬅️ Tambahkan ini jika ada
+     
+                UserRoleChart::class, // ⬅️ Tambahkan ini jika ada
+            ])
 
             ->middleware([
                 EncryptCookies::class,

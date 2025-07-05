@@ -21,6 +21,8 @@ use App\Http\Controllers\WorkoutSessionController;
 
 // Route untuk Halaman Depan (Welcome Page)
 // Logika sederhana seperti ini masih bisa diterima di file route.
+
+
 Route::get('/', function () {
     $tutorials = Tutorial::latest()->take(6)->get();
     $workoutOfTheDay = Tutorial::inRandomOrder()->first();
