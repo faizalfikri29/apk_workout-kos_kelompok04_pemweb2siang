@@ -62,6 +62,7 @@ class WorkoutsRelationManager extends RelationManager
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ViewAction::make(), // Tambahkan ini untuk melihat detail workout
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

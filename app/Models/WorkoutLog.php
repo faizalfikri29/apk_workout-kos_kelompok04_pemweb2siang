@@ -1,5 +1,7 @@
 <?php
 
+// File: app/Models/WorkoutLog.php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,22 +12,15 @@ class WorkoutLog extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'user_id',
         'workout_id',
-        'duration_minutes',
-        'calories_burned',
+        'duration_seconds',
     ];
 
     /**
-     * Get the user that owns the WorkoutLog.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * Mendefinisikan relasi ke model User.
+     * Satu log latihan dimiliki oleh satu user.
      */
     public function user(): BelongsTo
     {
@@ -33,12 +28,12 @@ class WorkoutLog extends Model
     }
 
     /**
-     * Get the workout that owns the WorkoutLog.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * Mendefinisikan relasi ke model Workout.
+     * Satu log latihan merujuk ke satu jenis workout.
      */
     public function workout(): BelongsTo
     {
         return $this->belongsTo(Workout::class);
     }
+    
 }

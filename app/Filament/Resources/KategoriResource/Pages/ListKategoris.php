@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Filament\Resources\WorkoutResource\Pages;
+namespace App\Filament\Resources\KategoriResource\Pages;
 
-use App\Filament\Resources\WorkoutResource;
+use App\Filament\Resources\KategoriResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
-class ListWorkouts extends ListRecords
+class ListKategoris extends ListRecords
 {
-    protected static string $resource = WorkoutResource::class;
+    protected static string $resource = KategoriResource::class;
 
     protected function getHeaderActions(): array
     {

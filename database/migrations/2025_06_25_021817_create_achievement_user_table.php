@@ -11,16 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('achievement_user', function (Blueprint $table) {
-            $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('achievement_id');
-            $table->timestamps(); // <== Tambahkan ini kalau belum ada
-        
+        // 1. NAMA TABEL DIPERBAIKI agar sesuai dengan error
+        Schema::create('user_achievements', function (Blueprint $table) {
+            
+            // 2. SINTAKS DITINGKATKAN menjadi lebih modern
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('achievement_id')->constrained()->onDelete('cascade');
+            
+            $table->timestamps();
+
+            // 3. PRIMARY KEY ditetapkan untuk mencegah duplikat
             $table->primary(['user_id', 'achievement_id']);
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('achievement_id')->references('id')->on('achievements')->onDelete('cascade');
         });
-        
     }
 
     /**
@@ -28,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('achievement_user');
+        Schema::dropIfExists('user_achievements');
     }
 };

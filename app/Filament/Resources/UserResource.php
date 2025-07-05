@@ -32,6 +32,15 @@ class UserResource extends Resource
                     ->minLength(8)
                     ->dehydrateStateUsing(fn ($state) => bcrypt($state))
                     ->visibleOn('create'),
+                Forms\Components\Select::make('role')
+                    ->options([
+                        'admin' => 'Admin',
+                        'user' => 'User',
+                    ])
+                    ->default('user')
+                    ->required()
+                    ->label('Role'),
+
             ]);
     }
 
@@ -42,10 +51,13 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('name')->searchable(),
                 Tables\Columns\TextColumn::make('email')->searchable(),
                 Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable(),
+                Tables\Columns\TextColumn::make('password'),
+                Tables\Columns\TextColumn::make('role')
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ViewAction::make()
             ]);
     }
 

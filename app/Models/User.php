@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\WorkoutLog; // Ini sudah benar
+use App\Models\Achievement; // Tambahkan untuk relasi achievements
 
 class User extends Authenticatable
 {
@@ -53,9 +55,10 @@ class User extends Authenticatable
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function workoutLogs(): HasMany
+    public function workoutLogs(): HasMany // NAMA FUNGSI DIPERBAIKI
     {
-        return $this->hasMany(WorkoutLog::class);
+        // MODEL YANG DITUJU JUGA DIPERBAIKI
+        return $this->hasMany(WorkoutLog::class); 
     }
 
     /**
@@ -65,6 +68,7 @@ class User extends Authenticatable
      */
     public function achievements(): BelongsToMany
     {
-        return $this->belongsToMany(Achievement::class, 'achievement_user');
+        // Pastikan nama tabel pivot sudah benar (contoh: 'achievement_user')
+        return $this->belongsToMany(Achievement::class, 'user_achievements');
     }
 }

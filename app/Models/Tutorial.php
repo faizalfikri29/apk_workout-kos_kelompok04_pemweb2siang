@@ -22,6 +22,8 @@ class Tutorial extends Model
         'kategori_workout_id',
         'gambar_url',
         'deksripsi_tutorial',
+        // 'name',
+        'kategori_workout_id',
     ];
 
     /**

@@ -73,6 +73,8 @@ class JadwalResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ViewAction::make(), // <-- Tambahkan ini untuk melihat detail jadwal
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

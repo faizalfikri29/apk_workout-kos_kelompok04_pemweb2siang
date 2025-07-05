@@ -6,7 +6,8 @@ use App\Http\Controllers\User\WorkoutController;
 use App\Http\Controllers\DashboardController;
 use App\Models\Tutorial;
 use App\Models\Jadwal;
-
+use App\Http\Controllers\WorkoutLogController;
+use App\Http\Controllers\WorkoutSessionController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -41,8 +42,11 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // Rute untuk Sesi Latihan dan Logging
+    Route::get('/workout/session/{jadwal}', [WorkoutSessionController::class, 'start'])->name('workout.session.start');
+Route::post('/workout/session', [WorkoutSessionController::class, 'store'])->name('workout.session.store');
     Route::get('/workout/session/{jadwal}', [WorkoutController::class, 'startSession'])->name('workout.session.start');
-    Route::post('/workout/log', [WorkoutController::class, 'storeLog'])->name('workout.log.store'); 
+    Route::post('/workout/session', [WorkoutSessionController::class, 'store'])->name('workout.session.store');
+    Route::post('/workout/log', [WorkoutLogController::class, 'store'])->name('workout.log.store')->middleware('auth');
 });
 
 // Memuat rute otentikasi (login, register, dll.)
