@@ -6,7 +6,7 @@ use App\Models\Achievement;
 use App\Models\Jadwal;
 use App\Models\WorkoutLog;
 use App\Models\User;
-use App\Models\Notification; // Tambahkan baris ini
+use App\Models\Notification;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -48,25 +48,44 @@ class DashboardController extends Controller
         $stats = array_merge($stats, $this->getWorkoutTypeDistribution($user->id));
 
         // 4. LOGIKA ACHIEVEMENT
+        // Ambil semua achievement sekali saja untuk efisiensi.
+        $allAchievements = Achievement::all(); // FIX: Menghapus orderBy('condition_value') yang menyebabkan error.
+        
         // Memeriksa apakah ada lencana baru yang terbuka setelah latihan.
-        $userAchievementIds = $this->checkAndUnlockAchievements($user, $totalSesi, $streak);
-        $allAchievements = Achievement::all();
+        $userAchievementIds = $this->checkAndUnlockAchievements($user, $allAchievements, $totalSesi, $streak);
+        
+        // Logika untuk lencana berikutnya
+        $nextAchievementData = $this->getNextAchievementData($user, $allAchievements, $userAchievementIds, $totalSesi, $streak);
+        $nextAchievement = $nextAchievementData['nextAchievement'];
+        $nextAchievementProgress = $nextAchievementData['progress'];
+
 
         // 5. DATA KALENDER
         // Menyiapkan data tanggal untuk ditandai di kalender.
         $workoutDates = $logs->map(fn($log) => $log->created_at->toDateString())->unique()->values()->toArray();
 
         // 6. NOTIFIKASI
-        $notifications = Notification::where('is_active', true)->orderBy('created_at', 'desc')->get(); // Tambahkan baris ini
+        $notifications = Notification::where('is_active', true)->orderBy('created_at', 'desc')->get();
+
+        // 7. LATIHAN FAVORIT
+        // Mengambil 3 latihan yang paling sering dilakukan oleh pengguna.
+        $favoriteWorkouts = $this->getFavoriteWorkouts($user);
+        
+        // 8. SAPAAN SELAMAT PAGI/SIANG/MALAM
+        $greeting = $this->getGreeting();
 
         // Mengirim semua data yang sudah diproses ke view.
         return view('dashboard', [
+            'greeting' => $greeting,
             'latihanHarian' => $latihanHarian,
             'stats' => $stats,
             'workoutDates' => $workoutDates,
             'allAchievements' => $allAchievements,
             'userAchievementIds' => $userAchievementIds,
-            'notifications' => $notifications, // Tambahkan baris ini
+            'nextAchievement' => $nextAchievement,
+            'nextAchievementProgress' => $nextAchievementProgress,
+            'notifications' => $notifications,
+            'favoriteWorkouts' => $favoriteWorkouts,
         ]);
     }
 
@@ -81,25 +100,31 @@ class DashboardController extends Controller
             return 0;
         }
 
-        $logDates = $logs->map(fn($log) => $log->created_at->startOfDay())->unique();
+        $logDates = $logs->map(fn($log) => $log->created_at->startOfDay())->unique()->values();
 
-        // Streak akan 0 jika tidak latihan hari ini atau kemarin.
-        if (!$logDates->contains(Carbon::today()) && !$logDates->contains(Carbon::yesterday())) {
+        // Cek apakah latihan terakhir adalah hari ini atau kemarin
+        $today = Carbon::today();
+        $yesterday = Carbon::yesterday();
+        $lastLogDate = $logDates->first();
+
+        if (!$lastLogDate->isSameDay($today) && !$lastLogDate->isSameDay($yesterday)) {
             return 0;
         }
-
-        $streak = 1;
-        $lastDate = $logDates->first(); // Tanggal latihan terakhir
-
-        // Menghitung mundur untuk mencari hari beruntun.
-        foreach ($logDates->slice(1) as $date) {
-            if ($lastDate->diffInDays($date) == 1) {
-                $streak++;
-                $lastDate = $date;
-            } else {
-                break; // Hentikan jika ada jeda hari.
+        
+        $streak = 0;
+        if ($logDates->isNotEmpty()) {
+            $streak = 1;
+            $currentDate = $logDates->first();
+            for ($i = 1; $i < $logDates->count(); $i++) {
+                if ($currentDate->diffInDays($logDates[$i]) == 1) {
+                    $streak++;
+                    $currentDate = $logDates[$i];
+                } else {
+                    break;
+                }
             }
         }
+
         return $streak;
     }
 
@@ -157,13 +182,14 @@ class DashboardController extends Controller
     /**
      * Memeriksa dan membuka achievement baru untuk pengguna.
      * @param \App\Models\User $user
+     * @param \Illuminate\Database\Eloquent\Collection $allAchievements
      * @param int $totalSesi
      * @param int $streak
      * @return array
      */
-    private function checkAndUnlockAchievements(User $user, int $totalSesi, int $streak): array
+    private function checkAndUnlockAchievements(User $user, $allAchievements, int $totalSesi, int $streak): array
     {
-        $allAchievements = Achievement::all();
+        // REFACTOR: Tidak perlu query lagi, data sudah di-pass dari index()
         $userAchievementIds = $user->achievements()->pluck('achievements.id')->toArray();
 
         foreach ($allAchievements as $achievement) {
@@ -184,5 +210,82 @@ class DashboardController extends Controller
             }
         }
         return $userAchievementIds;
+    }
+
+    /**
+     * Fungsi untuk mendapatkan lencana berikutnya dan progresnya
+     * @param \App\Models\User $user
+     * @param \Illuminate\Database\Eloquent\Collection $allAchievements
+     * @param array $userAchievementIds
+     * @param int $totalSesi
+     * @param int $streak
+     * @return array
+     */
+    private function getNextAchievementData(User $user, $allAchievements, $userAchievementIds, int $totalSesi, int $streak)
+    {
+        $nextAchievement = null;
+        $progress = 0;
+
+        // Cari lencana berikutnya yang belum terbuka, diurutkan berdasarkan nilai kondisi
+        $nextAchievement = $allAchievements->whereNotIn('id', $userAchievementIds)->sortBy('condition_value')->first();
+
+        if ($nextAchievement) {
+            if ($nextAchievement->condition_type == 'sessions') {
+                $progress = ($totalSesi / $nextAchievement->condition_value) * 100;
+            } elseif ($nextAchievement->condition_type == 'streak') {
+                $progress = ($streak / $nextAchievement->condition_value) * 100;
+            }
+        }
+
+        return [
+            'nextAchievement' => $nextAchievement,
+            'progress' => min($progress, 100) // Pastikan progress tidak lebih dari 100%
+        ];
+    }
+
+    /**
+     * Fungsi untuk mendapatkan latihan favorit pengguna
+     * @param \App\Models\User $user
+     * @return \Illuminate\Support\Collection
+     */
+    private function getFavoriteWorkouts(User $user)
+    {
+        // Hitung jadwal mana yang paling sering muncul di log
+        $favoriteScheduleIds = $user->workoutLogs()
+            ->select('jadwal_id', DB::raw('COUNT(jadwal_id) as count'))
+            ->whereNotNull('jadwal_id')
+            ->groupBy('jadwal_id')
+            ->orderByDesc('count')
+            ->limit(3)
+            ->pluck('jadwal_id');
+
+        if ($favoriteScheduleIds->isEmpty()) {
+            return collect(); // Kembalikan koleksi kosong jika tidak ada favorit
+        }
+
+        // Ambil detail jadwal berdasarkan ID favorit
+        return Jadwal::whereIn('id', $favoriteScheduleIds)->get()->map(function ($schedule) {
+            return (object) [
+                'id' => $schedule->id,
+                'name' => $schedule->nama_jadwal,
+                'route' => route('workout.session.start', $schedule->id)
+            ];
+        });
+    }
+
+    /**
+     * Fungsi untuk sapaan dinamis berdasarkan waktu
+     * @return string
+     */
+    private function getGreeting(): string
+    {
+        $hour = Carbon::now()->hour;
+        if ($hour < 12) {
+            return 'Selamat Pagi';
+        } elseif ($hour < 18) {
+            return 'Selamat Malam'; // FIX: Seharusnya 'Selamat Siang' atau 'Sore'
+        } else {
+            return 'Selamat Malam';
+        }
     }
 }
