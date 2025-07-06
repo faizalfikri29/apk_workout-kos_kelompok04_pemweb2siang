@@ -5,10 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Achievement;
 use App\Models\Jadwal;
 use App\Models\WorkoutLog;
-use App\Models\User; // Direkomendasikan untuk menambahkan ini untuk type-hinting
+use App\Models\User;
+use App\Models\Notification; // Tambahkan baris ini
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB; // Diperbaiki: satu titik koma
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -55,6 +56,9 @@ class DashboardController extends Controller
         // Menyiapkan data tanggal untuk ditandai di kalender.
         $workoutDates = $logs->map(fn($log) => $log->created_at->toDateString())->unique()->values()->toArray();
 
+        // 6. NOTIFIKASI
+        $notifications = Notification::where('is_active', true)->orderBy('created_at', 'desc')->get(); // Tambahkan baris ini
+
         // Mengirim semua data yang sudah diproses ke view.
         return view('dashboard', [
             'latihanHarian' => $latihanHarian,
@@ -62,6 +66,7 @@ class DashboardController extends Controller
             'workoutDates' => $workoutDates,
             'allAchievements' => $allAchievements,
             'userAchievementIds' => $userAchievementIds,
+            'notifications' => $notifications, // Tambahkan baris ini
         ]);
     }
 

@@ -102,21 +102,52 @@
                     @endif
                     
                     {{-- Grafik Progress & Distribusi Latihan dalam Tabs --}}
-                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-2xl transition-all duration-500 opacity-0 translate-y-4" x-data="{ tab: 'weekly' }">
-                        <div class="p-6">
-                            <div class="border-b border-gray-200 dark:border-gray-700">
-                                <nav class="-mb-px flex space-x-6">
-                                    <button @click="tab = 'weekly'" :class="{ 'border-indigo-500 text-indigo-600': tab === 'weekly', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': tab !== 'weekly' }" class="whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm">Progress Mingguan</button>
-                                    <button @click="tab = 'distribution'" :class="{ 'border-indigo-500 text-indigo-600': tab === 'distribution', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': tab !== 'distribution' }" class="whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm">Tipe Latihan</button>
-                                </nav>
-                            </div>
-                            <div class="mt-6">
-                                <div x-show="tab === 'weekly'" x-cloak class="h-64"><canvas id="weeklyProgressChart"></canvas></div>
-                                <div x-show="tab === 'distribution'" x-cloak class="h-64 flex justify-center items-center"><canvas id="workoutTypeChart"></canvas></div>
-                            </div>
+                   {{-- Notifikasi --}}
+                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-2xl rounded-3xl transition-all duration-500 opacity-0 translate-y-4">
+                        <div class="p-8 text-gray-900 dark:text-gray-100">
+                            <h4 class="text-3xl font-extrabold mb-8 flex items-center text-indigo-700 dark:text-indigo-400">
+                                <x-heroicon-o-sparkles class="h-9 w-9 mr-4 text-yellow-400 animate-pulse" />
+                                Pesan Penting Untukmu
+                            </h4>
+                            @if($notifications->isNotEmpty())
+                                <ul class="space-y-5">
+                                    @foreach($notifications as $notification)
+                                        <li class="group flex items-start p-7 bg-gradient-to-br from-white to-indigo-50 dark:from-gray-900 dark:to-gray-800 rounded-2xl shadow-xl border border-transparent hover:border-indigo-400 dark:hover:border-blue-600 transform transition-all duration-300 hover:scale-[1.015] hover:shadow-2xl cursor-pointer relative overflow-hidden">
+                                            {{-- Background efek blur --}}
+                                            <div class="absolute inset-0 bg-indigo-100 dark:bg-blue-900 opacity-0 group-hover:opacity-10 transition-opacity duration-300 pointer-events-none rounded-2xl"></div>
+
+                                            <div class="flex-shrink-0 mr-5">
+                                                {{-- Ikon notifikasi yang disesuaikan --}}
+                                                <x-heroicon-o-megaphone class="h-10 w-10 text-indigo-500 dark:text-blue-400 group-hover:rotate-6 transition-transform duration-300" />
+                                            </div>
+                                            <div class="flex-grow">
+                                                <h5 class="font-bold text-2xl text-gray-900 dark:text-gray-100 mb-1 leading-tight">{{ $notification->title }}</h5>
+                                                <div class="text-base text-gray-700 dark:text-gray-300 mt-2 leading-relaxed">
+                                                    {!! $notification->message !!}
+                                                </div>
+                                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-3 flex items-center">
+                                                    <x-heroicon-o-clock class="h-4 w-4 mr-1" />
+                                                    Diterima <span class="font-semibold ml-1">{{ $notification->created_at->diffForHumans() }}</span>
+                                                </p>
+                                            </div>
+                                            <div class="ml-auto pl-6 flex-shrink-0 self-center">
+                                                <x-heroicon-o-arrow-right-circle class="h-8 w-8 text-indigo-400 dark:text-blue-500 opacity-70 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300" />
+                                            </div>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @else
+                                <div class="text-center py-12 bg-gray-100 dark:bg-gray-700 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600">
+                                    <x-heroicon-o-document-magnifying-glass class="h-24 w-24 text-gray-400 mx-auto mb-6 opacity-75" />
+                                    <p class="text-xl font-semibold text-gray-600 dark:text-gray-300">Belum ada pesan untuk Anda.</p>
+                                    <p class="text-base text-gray-500 dark:text-gray-400 mt-3">Tetaplah berlatih dan cek secara berkala!</p>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
+
+                
 
                 {{-- Kolom Kanan --}}
                 <div class="lg:col-span-1 space-y-8" x-data x-init="
