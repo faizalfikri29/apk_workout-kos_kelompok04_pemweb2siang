@@ -1,42 +1,36 @@
 <?php
 
+// app/Filament/Resources/NotificationResource.php
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\AchievementResource\Pages;
-use App\Models\Achievement;
+use App\Filament\Resources\NotificationResource\Pages;
+use App\Models\Notification;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-class AchievementResource extends Resource
+class NotificationResource extends Resource
 {
-    protected static ?string $model = Achievement::class;
+    protected static ?string $model = Notification::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-sparkles';
-
-    protected static ?string $navigationGroup = 'Manajemen Konten';
+    protected static ?string $navigationIcon = 'heroicon-o-bell-alert'; // Icon notifikasi
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\Textarea::make('description')
-                    ->required()
-                    ->columnSpanFull(),
-                // Menambahkan input untuk 'icon'
-                Forms\Components\TextInput::make('icon')
+                Forms\Components\TextInput::make('title')
                     ->required()
                     ->maxLength(255)
-                    ->helperText('Masuki icon, contoh: rocket-launch,moon,star, dll. Anda bisa menggunakan icon dari Heroicons.'),
-                Forms\Components\TextInput::make('points')
+                    ->columnSpanFull(),
+                Forms\Components\RichEditor::make('message')
                     ->required()
-                    ->numeric()
-                    ->default(0),
+                    ->columnSpanFull(),
+                Forms\Components\Toggle::make('is_active')
+                    ->required()
+                    ->label('Aktifkan Notifikasi'),
             ]);
     }
 
@@ -44,14 +38,11 @@ class AchievementResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                Tables\Columns\TextColumn::make('title')
                     ->searchable(),
-                // Menambahkan kolom untuk 'icon'
-                Tables\Columns\TextColumn::make('icon')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('points')
-                    ->numeric()
-                    ->sortable(),
+                Tables\Columns\IconColumn::make('is_active')
+                    ->boolean()
+                    ->label('Status Aktif'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -85,9 +76,9 @@ class AchievementResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListAchievements::route('/'),
-            'create' => Pages\CreateAchievement::route('/create'),
-            'edit' => Pages\EditAchievement::route('/{record}/edit'),
+            'index' => Pages\ListNotifications::route('/'),
+            'create' => Pages\CreateNotification::route('/create'),
+            'edit' => Pages\EditNotification::route('/{record}/edit'),
         ];
     }
 }

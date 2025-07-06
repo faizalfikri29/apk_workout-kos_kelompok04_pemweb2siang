@@ -10,12 +10,14 @@ use App\Models\KategoriWorkout;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
+
 class WelcomeController extends Controller
 {
     public function index()
     {
         // Mengambil data statistik
         $activeUsersCount = User::where('role', 'user')->count();
+
         $tutorialsCount = Tutorial::count();
         $workoutOfTheDay = Tutorial::with('kategoriWorkout')->inRandomOrder()->first();
 
