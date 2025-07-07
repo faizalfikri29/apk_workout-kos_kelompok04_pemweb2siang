@@ -22,9 +22,11 @@ class WorkoutLogResource extends Resource
 
     protected static ?string $navigationGroup = 'Aktivitas Pengguna';
 
+
     protected static ?string $modelLabel = 'Log Latihan';
 
     protected static ?string $pluralModelLabel = 'Log Latihan';
+    
 
     protected static ?string $recordTitleAttribute = 'user.name';
 

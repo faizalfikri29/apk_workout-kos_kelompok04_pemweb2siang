@@ -40,14 +40,14 @@ class WelcomeController extends Controller
             [
                 'name' => 'Hanung Tri Atmojo',
                 'role' => 'Sistem Informasi',
-                'description' => 'Pawangnya if-else, semua masalah diselesaikan dengan percabangan.',
-                'imageUrl' => 'https://placehold.co/400x400/667eea/ffffff?text=HTA'
+                'description' => 'bikin password baru, ga lama kemnudian lupa',
+                'imageUrl' => 'https://i.pinimg.com/736x/dd/37/49/dd37497430a34ec48350c2b864645917.jpg'
             ],
             [
                 'name' => 'Muhamad Faizal Fikri',
                 'role' => 'Sistem Informasi',
-                'description' => 'Tukang hias website. Kalau ada yang miring-miring, dia yang lurusin pake CSS.',
-                'imageUrl' => 'https://placehold.co/400x400/764ba2/ffffff?text=MFF'
+                'description' => 'Tetap semangat walaupun pusing datang',
+                'imageUrl' => 'https://i.pinimg.com/736x/a6/92/a1/a692a109971179007eabc4f607658d73.jpg'
             ],
             [
                 'name' => 'Eka Ferdy Febriyansah',
@@ -58,20 +58,20 @@ class WelcomeController extends Controller
             [
                 'name' => 'Fariza Zea De Asminto',
                 'role' => 'Sistem Informasi',
-                'description' => 'Ahli pewarnaan tombol dan pembuat icon lucu. Katanya, UX adalah segalanya.',
-                'imageUrl' => 'https://placehold.co/400x400/c084fc/ffffff?text=FZA'
+                'description' => 'Workout biar nggak gampang capek pas naik tangga ke lantai 3. Itu aja sih, terima gaji🙏',
+                'imageUrl' => 'https://i.pinimg.com/736x/70/6c/62/706c62dd2eb78809f475901c6a20a85b.jpg'
             ],
             [
                 'name' => 'Fathiyah Az Zahra Karim',
                 'role' => 'Sistem Informasi',
-                'description' => 'Penjaga gerbang server. Kalau web lemot, dia yang pertama kali kena omel.',
-                'imageUrl' => 'https://placehold.co/400x400/3b82f6/ffffff?text=FAZ'
+                'description' => 'hidup itu asyik kalo ga mikirin deadline ',
+                'imageUrl' => 'https://i.pinimg.com/736x/1b/11/ed/1b11edcc51b7ad4e5125727be0a645cd.jpg'
             ],
             [
                 'name' => 'Khaila Nazwa',
                 'role' => 'Sistem Informasi',
-                'description' => 'Pencari bug profesional. Mottonya: \'Kalau tidak rusak, jangan diperbaiki.\'',
-                'imageUrl' => 'https://placehold.co/400x400/10b981/ffffff?text=KN'
+                'description' => 'mikirin deadline aja udah bikin pusing, apalagi mikirin kata-kata',
+                'imageUrl' => 'https://i.pinimg.com/736x/1d/3b/35/1d3b350e3b954ec08ca321de631ffc78.jpg'
             ],
         ];
 
