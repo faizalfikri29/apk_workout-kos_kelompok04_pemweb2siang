@@ -37,4 +37,6 @@ class Workout extends Model
         // Pastikan Anda memiliki model App\Models\Tutorial
         return $this->belongsTo(Tutorial::class);
     }
+
+    
 }

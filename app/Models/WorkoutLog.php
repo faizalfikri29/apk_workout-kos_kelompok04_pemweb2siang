@@ -1,12 +1,9 @@
 <?php
 
-// File: app/Models/WorkoutLog.php
-
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class WorkoutLog extends Model
 {
@@ -16,24 +13,20 @@ class WorkoutLog extends Model
         'user_id',
         'workout_id',
         'duration_seconds',
+        'jadwal_id',
     ];
 
-    /**
-     * Mendefinisikan relasi ke model User.
-     * Satu log latihan dimiliki oleh satu user.
-     */
-    public function user(): BelongsTo
+    public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Mendefinisikan relasi ke model Workout.
-     * Satu log latihan merujuk ke satu jenis workout.
-     */
-    public function workout(): BelongsTo
+    public function workout()
     {
         return $this->belongsTo(Workout::class);
     }
-    
+
+
+
+
 }

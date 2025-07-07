@@ -1,5 +1,4 @@
 <?php
-// File: app/Filament/Resources/WorkoutLogResource/Pages/ListWorkoutLogs.php
 
 namespace App\Filament\Resources\WorkoutLogResource\Pages;
 
@@ -13,7 +12,7 @@ class ListWorkoutLogs extends ListRecords
 
     protected function getHeaderActions(): array
     {
-        // Dikosongkan untuk menghilangkan tombol "New Log Latihan"
+        // Kosongkan karena log tidak boleh dibuat/ditambah dari panel
         return [];
     }
 }

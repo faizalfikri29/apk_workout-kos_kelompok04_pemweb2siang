@@ -2,7 +2,10 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Widgets\StatsOverview;
+use App\Filament\Widgets\DailyScheduleChart;
+use App\Filament\Widgets\UserRoleChart;
+// Hapus atau komentari 'StatsOverview' yang lama
+// use App\Filament\Widgets\StatsOverview; 
 use App\Filament\Widgets\UsersChart;
 use App\Filament\Widgets\WorkoutCategoryChart;
 use App\Http\Middleware\CheckAdminRole;
@@ -22,6 +25,8 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use App\Filament\Widgets\WorkoutLogChart;
+use App\Filament\Widgets\CustomStatsOverview; // <-- TAMBAHKAN INI
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -39,8 +44,9 @@ class AdminPanelProvider extends PanelProvider
                 'primary' => Color::Blue,
             ])
             ->brandName('Workout Kos')
-            ->brandLogo(asset('images/logo.svg'))
-            ->favicon(asset('images/favicon.png'))
+            ->brandLogo(asset('images/logo3.png'))
+            ->favicon(asset('images/logo3.png'))
+            ->brandLogoHeight('110px')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
@@ -48,9 +54,12 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                StatsOverview::class,
+                CustomStatsOverview::class, // <-- GANTI DARI StatsOverview::class MENJADI INI
                 UsersChart::class,
                 WorkoutCategoryChart::class,
+                WorkoutLogChart::class,
+                DailyScheduleChart::class,
+                UserRoleChart::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -73,7 +82,7 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make()
                     ->label('Aktivitas Pengguna'),
                 NavigationGroup::make()
-                    ->label('Manajemen Peng guna'),
+                    ->label('Manajemen Penggunaa'),
             ])
             ->sidebarCollapsibleOnDesktop()
             ->maxContentWidth('full')

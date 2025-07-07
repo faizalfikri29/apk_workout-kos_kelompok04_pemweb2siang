@@ -25,7 +25,7 @@
             {{-- Statistik Utama dengan Animasi Angka dan On-Load --}}
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8" x-data x-init="
                 $el.childNodes.forEach((node, i) => {
-                    if (node.nodeType === 1) { // Memastikan ini adalah elemen HTML
+                    if (node.nodeType === 1) {
                         setTimeout(() => { node.classList.remove('opacity-0', 'translate-y-4') }, (i * 100));
                     }
                 })
@@ -93,7 +93,7 @@
                             <div>
                                 <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-200">Hari Istirahat!</h3>
                                 <p class="mt-2 text-gray-600 dark:text-gray-300">Tubuhmu butuh waktu untuk pulih. Manfaatkan hari ini untuk istirahat.</p>
-                                <a href="#" class="mt-4 inline-flex items-center text-indigo-600 dark:text-indigo-400 font-semibold">
+                                <a href="{{ route('user.workouts.index') }}" class="mt-4 inline-flex items-center text-indigo-600 dark:text-indigo-400 font-semibold">
                                     Lihat Semua Jadwal Latihan <x-heroicon-o-arrow-right class="w-4 h-4 ml-1" />
                                 </a>
                             </div>
@@ -101,19 +101,46 @@
                         </div>
                     @endif
                     
-                    {{-- Grafik Progress & Distribusi Latihan dalam Tabs --}}
-                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-2xl transition-all duration-500 opacity-0 translate-y-4" x-data="{ tab: 'weekly' }">
-                        <div class="p-6">
-                            <div class="border-b border-gray-200 dark:border-gray-700">
-                                <nav class="-mb-px flex space-x-6">
-                                    <button @click="tab = 'weekly'" :class="{ 'border-indigo-500 text-indigo-600': tab === 'weekly', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': tab !== 'weekly' }" class="whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm">Progress Mingguan</button>
-                                    <button @click="tab = 'distribution'" :class="{ 'border-indigo-500 text-indigo-600': tab === 'distribution', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': tab !== 'distribution' }" class="whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm">Tipe Latihan</button>
-                                </nav>
-                            </div>
-                            <div class="mt-6">
-                                <div x-show="tab === 'weekly'" x-cloak class="h-64"><canvas id="weeklyProgressChart"></canvas></div>
-                                <div x-show="tab === 'distribution'" x-cloak class="h-64 flex justify-center items-center"><canvas id="workoutTypeChart"></canvas></div>
-                            </div>
+
+                    
+                    {{-- Notifikasi --}}
+                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-2xl rounded-3xl transition-all duration-500 opacity-0 translate-y-4">
+                        <div class="p-8 text-gray-900 dark:text-gray-100">
+                            <h4 class="text-3xl font-extrabold mb-8 flex items-center text-indigo-700 dark:text-indigo-400">
+                                <x-heroicon-o-sparkles class="h-9 w-9 mr-4 text-yellow-400 animate-pulse" />
+                                Pesan Penting Untukmu
+                            </h4>
+                            @if($notifications->isNotEmpty())
+                                <ul class="space-y-5">
+                                    @foreach($notifications as $notification)
+                                        <li class="group flex items-start p-7 bg-gradient-to-br from-white to-indigo-50 dark:from-gray-900 dark:to-gray-800 rounded-2xl shadow-xl border border-transparent hover:border-indigo-400 dark:hover:border-blue-600 transform transition-all duration-300 hover:scale-[1.015] hover:shadow-2xl cursor-pointer relative overflow-hidden">
+                                            <div class="absolute inset-0 bg-indigo-100 dark:bg-blue-900 opacity-0 group-hover:opacity-10 transition-opacity duration-300 pointer-events-none rounded-2xl"></div>
+                                            <div class="flex-shrink-0 mr-5">
+                                                <x-heroicon-o-megaphone class="h-10 w-10 text-indigo-500 dark:text-blue-400 group-hover:rotate-6 transition-transform duration-300" />
+                                            </div>
+                                            <div class="flex-grow">
+                                                <h5 class="font-bold text-2xl text-gray-900 dark:text-gray-100 mb-1 leading-tight">{{ $notification->title }}</h5>
+                                                <div class="text-base text-gray-700 dark:text-gray-300 mt-2 leading-relaxed">
+                                                    {!! $notification->message !!}
+                                                </div>
+                                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-3 flex items-center">
+                                                    <x-heroicon-o-clock class="h-4 w-4 mr-1" />
+                                                    Diterima <span class="font-semibold ml-1">{{ $notification->created_at->diffForHumans() }}</span>
+                                                </p>
+                                            </div>
+                                            <div class="ml-auto pl-6 flex-shrink-0 self-center">
+                                                <x-heroicon-o-arrow-right-circle class="h-8 w-8 text-indigo-400 dark:text-blue-500 opacity-70 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300" />
+                                            </div>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @else
+                                <div class="text-center py-12 bg-gray-100 dark:bg-gray-700 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600">
+                                    <x-heroicon-o-document-magnifying-glass class="h-24 w-24 text-gray-400 mx-auto mb-6 opacity-75" />
+                                    <p class="text-xl font-semibold text-gray-600 dark:text-gray-300">Belum ada pesan untuk Anda.</p>
+                                    <p class="text-base text-gray-500 dark:text-gray-400 mt-3">Tetaplah berlatih dan cek secara berkala!</p>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -141,16 +168,39 @@
                                  <template x-for="blankday in blankdays"><div></div></template>
                                  <template x-for="date in no_of_days" :key="date">
                                      <div class="w-full h-8 flex items-center justify-center rounded-full"
-                                          :class="{
+                                           :class="{
                                              'bg-green-500 text-white font-bold': isWorkoutDay(date),
                                              'bg-indigo-600 text-white': isToday(date) && isWorkoutDay(date),
                                              'ring-2 ring-indigo-500': isToday(date) && !isWorkoutDay(date)
-                                          }"
-                                          x-text="date">
+                                           }"
+                                           x-text="date">
                                      </div>
                                  </template>
                              </div>
                         </div>
+                    </div>
+                    
+                    {{-- Latihan Favorit --}}
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg transition-all duration-500 opacity-0 translate-y-4">
+                        <h4 class="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Akses Cepat Favorit</h4>
+                        @if(isset($favoriteWorkouts) && $favoriteWorkouts->isNotEmpty())
+                            <ul class="space-y-3">
+                                @foreach($favoriteWorkouts as $fav)
+                                <li>
+                                    <a href="{{ $fav->route }}" class="group flex items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors">
+                                        <x-heroicon-o-heart class="h-6 w-6 text-indigo-500 mr-4"/>
+                                        <span class="flex-1 font-medium text-gray-700 dark:text-gray-300">{{ $fav->name }}</span>
+                                        <x-heroicon-o-chevron-right class="h-5 w-5 text-gray-400 group-hover:text-indigo-600 transition-colors"/>
+                                    </a>
+                                </li>
+                                @endforeach
+                            </ul>
+                        @else
+                            <div class="text-center py-4">
+                                <p class="text-sm text-gray-500">Belum ada latihan favorit.</p>
+                                <p class="text-xs text-gray-400 mt-1">Selesaikan latihan untuk menambahkannya.</p>
+                            </div>
+                        @endif
                     </div>
 
                     {{-- Menuju Lencana Berikutnya --}}
@@ -182,7 +232,7 @@
                                 <div class="grid grid-cols-4 gap-4">
                                     @foreach($allAchievements as $achievement)
                                         @php $unlocked = isset($userAchievementIds) && in_array($achievement->id, $userAchievementIds); @endphp
-                                        <div class="text-center" title="{{ $achievement->description }}">
+                                        <div class="text-center" title="{{ $achievement->name }} - {{ $achievement->description }}">
                                             <div class="relative">
                                                 <x-dynamic-component :component="'heroicon-s-' . $achievement->icon" class="h-12 w-12 mx-auto transition-all {{ $unlocked ? 'text-yellow-400 hover:scale-110' : 'text-gray-300 dark:text-gray-600 opacity-60' }}" />
                                                 @if(!$unlocked)
