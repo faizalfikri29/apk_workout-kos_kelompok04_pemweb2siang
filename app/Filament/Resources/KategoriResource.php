@@ -10,6 +10,7 @@ use Filament\Resources\Resource;
 use Filament\Forms\Form;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Tables\Columns\TextColumn;
 
 class KategoriResource extends Resource
 {
@@ -42,7 +43,7 @@ class KategoriResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('id')->sortable(),
+                // TextColumn::make('id')->sortable(),
                 TextColumn::make('name')->searchable()->sortable(),
                 TextColumn::make('description')->wrap()->label('Description'),
                 TextColumn::make('created_at')

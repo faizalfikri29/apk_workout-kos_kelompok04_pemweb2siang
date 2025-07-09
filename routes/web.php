@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\WelcomeController;
 use App\Models\Tutorial;
 use App\Models\Jadwal;
 use App\Http\Controllers\WorkoutLogController;
