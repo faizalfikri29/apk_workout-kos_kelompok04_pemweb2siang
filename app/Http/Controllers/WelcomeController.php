@@ -53,7 +53,7 @@ class WelcomeController extends Controller
                 'name' => 'Eka Ferdy Febriyansah',
                 'role' => 'Sistem Informasi',
                 'description' => 'Juru kunci database. Jangan sampai salah query, nanti data hilang dia yang dicari.',
-                'imageUrl' => 'https://placehold.co/400x400/a78bfa/ffffff?text=EFF'
+                'imageUrl' => 'https://i.pinimg.com/1200x/22/99/fa/2299fa5ce714b9c57b20e243a50048f2.jpg'
             ],
             [
                 'name' => 'Fariza Zea De Asminto',
